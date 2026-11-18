@@ -1,0 +1,493 @@
+export const donationTranslations = {
+  en: {
+    heroTitle: "Join the Legacy of Khidmat",
+    heroQuote: '"Every contribution becomes a source of hope, helping us serve humanity in the spirit of Ahlul Bayt (A.S.) and the timeless teachings of Khwaja Garib Nawaz (A.S.)."',
+    
+    // Humble Request Note
+    humbleRequestTitle: "A Humble Request",
+    humbleRequestDesc: "Kindly offer your contributions as Nazar-o-Niyaz or Khums (if applicable). As this Foundation also serves members of the Syed community, we respectfully request that Zakat, Khairat, and Sadaqah not be donated for this cause.",
+    btnUnderstand: "I Understand & Proceed",
+    
+    // Donor Types
+    donorIndian: "Indian Donor",
+    donorNri: "NRI Donor",
+    donorInternational: "International Donor",
+    
+    // Frequency
+    frequencyLabel: "Donation Frequency",
+    freqOnce: "One Time",
+    freqMonthly: "Monthly",
+    
+    // Cause
+    causeLabel: "Donation Cause",
+    causes: {
+      "Where Needed Most": "Where Needed Most",
+      "Hussaini Langar Revival": "Hussaini Langar Revival",
+      "Fatimi Langar": "Fatimi Langar",
+      "Religious & Community Events": "Religious & Community Events",
+      "General Charity": "General Charity"
+    },
+    
+    // Amount
+    selectAmount: "Select Amount",
+    currency: "INR (₹)",
+    customAmountPlaceholder: "Enter Custom Amount",
+    btnProceed: "Proceed to Details",
+    
+    // Step 2 Form
+    btnBack: "Back",
+    donationAmountLabel: "Donation Amount",
+    fullNameLabel: "Full Name",
+    fullNamePlaceholder: "Enter your full name",
+    emailLabel: "Email Address",
+    emailPlaceholder: "Enter your email",
+    mobileLabel: "Mobile Number",
+    mobilePlaceholder: "Enter mobile number",
+    countryLabel: "Country",
+    countryPlaceholder: "e.g. India",
+    cityLabel: "City",
+    cityPlaceholder: "e.g. Mumbai",
+    panLabel: "PAN Number",
+    panOptional: "(Optional)",
+    panPlaceholder: "For 80G Tax Exemption",
+    
+    // 80G
+    taxExemptionTitle: "80G Tax Exemption",
+    taxExemptionDesc: "Do you require an 80G certificate for this donation?",
+    yes: "Yes",
+    no: "No",
+    
+    // Prayer
+    prayerLabel: "Prayer / Dua Request",
+    prayerOptional: "(Optional)",
+    prayerPlaceholder: "Share your intentions or names for prayers...",
+    btnCompleteDonation: "Complete Donation",
+    
+    // Payment Modal
+    securePayment: "Secure Payment",
+    orderId: "Order ID",
+    totalAmount: "Total Amount",
+    encrypted100: "100% Secure & Encrypted",
+    processingPayment: "Processing Payment...",
+    processingWait: "Please do not close this window or press back.",
+    methods: {
+      upi: "UPI",
+      upiSub: "GPay, PhonePe, Paytm, BHIM",
+      card: "Credit / Debit Card",
+      cardSub: "Visa, Mastercard, RuPay",
+      netbanking: "Net Banking",
+      netbankingSub: "All major Indian banks",
+      wallet: "Wallets",
+      walletSub: "Mobikwik, Freecharge, etc.",
+      applepay: "Apple Pay",
+      applepaySub: "International",
+      int_card: "International Cards",
+      int_cardSub: "Amex, Diners, etc."
+    },
+    
+    // Success Step 4
+    successTitle: "Donation Successful!",
+    successDesc: "Thank you for your generous contribution, {name}. Your support helps us continue our noble mission.",
+    txnId: "Transaction ID",
+    date: "Date",
+    amount: "Amount",
+    cause: "Cause",
+    btnReceipt: "Download Receipt",
+    btnShare: "Share",
+    btnReturnHome: "Return to Homepage",
+    
+    // Alerts & Inline Validation
+    alertSelectAmount: "Please select or enter a valid amount (minimum ₹1).",
+    alertFillFields: "Please correct the highlighted fields below.",
+    alertInvalidEmail: "Please enter a valid email address (e.g. name@gmail.com).",
+    alertInvalidMobile: "Please enter a valid mobile number.",
+    alertInvalidPan: "Please enter a valid 10-character PAN number (e.g. ABCDE1234F).",
+    alertPanRequired80G: "PAN number is required for an 80G tax exemption certificate.",
+    alertEnterUtr: "Please enter your Transaction ID / UTR Reference (at least 6 characters).",
+    errRequired: "This field is required.",
+    errInvalidName: "Please enter your real full name (minimum 2 letters).",
+    errDisposableEmail: "Temporary or dummy email addresses are not accepted. Please use your active email.",
+    errEmailTypo: "Did you mean {suggestion}?",
+    errEmailDomainUnreachable: "This email domain does not appear to exist or receive emails. Please check carefully.",
+    errNonDigits: "Enter digits only (no letters or symbols).",
+    errInvalidIndianMobile: "Enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.",
+    errInvalidMobileLength: "Please enter a valid mobile number for the selected country code.",
+    errFakeMobilePattern: "Repeated or sequential test numbers are not allowed. Please enter a real mobile number.",
+    errInvalidLocation: "Please enter a valid name (minimum 2 letters).",
+    verifyingDetailsLabel: "Verifying Details...",
+
+    // Real Payment Flow
+    tabUpi: "UPI QR / Apps",
+    tabBank: "Bank Transfer",
+    tabOnline: "Card / NetBanking",
+    scanUpiTitle: "Scan QR with Any UPI App",
+    scanUpiDesc: "Pay the exact amount instantly via GPay, PhonePe, Paytm, or BHIM.",
+    openUpiApp: "Open UPI App",
+    upiIdLabel: "Foundation UPI ID",
+    copyLabel: "Copy",
+    copiedLabel: "Copied!",
+    utrStepTitle: "Step 2: Enter Payment Reference",
+    utrLabel: "UPI Transaction ID / UTR Number",
+    utrPlaceholder: "e.g. 412345678901",
+    utrHelper: "After paying, enter your 12-digit UTR / Reference ID to generate your official receipt.",
+    btnConfirmUtr: "Confirm & Generate Receipt",
+    submittingLabel: "Recording Donation...",
+    bankDetailsTitle: "Direct Bank Transfer (IMPS / NEFT / RTGS)",
+    bankAccHolder: "Account Holder",
+    bankNameLabel: "Bank Name",
+    bankAccNo: "Account Number",
+    bankIfsc: "IFSC Code",
+    bankAccType: "Account Type",
+    bankUtrLabel: "Bank Reference / UTR Number",
+    bankUtrPlaceholder: "Enter IMPS / NEFT / RTGS reference",
+    whatsappProofBtn: "Send Screenshot on WhatsApp",
+    gatewayCardsNote: "Instant Online Gateway (Visa, Mastercard, RuPay, NetBanking)",
+
+    // Receipt & Verification
+    receiptNoLabel: "Receipt No.",
+    statusLabel: "Status",
+    statusVerified: "Verified",
+    statusPendingVerify: "Recorded • Pending Bank Check",
+    paymentMethodLabel: "Method",
+    methodUpi: "UPI Transfer",
+    methodBank: "Bank Transfer",
+    methodGateway: "Online Gateway",
+    donorNameLabel: "Donor",
+    shareCopiedMsg: "Donation summary copied to clipboard!",
+    btnMakeAnother: "Make Another Donation",
+    verifyReceiptTitle: "Verify an Existing Donation Receipt",
+    verifyReceiptDesc: "Enter your Receipt Number (e.g. MGF-...) or Transaction / UTR ID to check its official status.",
+    verifyReceiptPlaceholder: "Enter Receipt No. or UTR / Transaction ID",
+    btnVerifyReceipt: "Verify Receipt",
+    verifyingReceipt: "Checking...",
+    receiptVerifiedBanner: "Official Foundation Record Found"
+  },
+
+  ur: {
+    heroTitle: "خدمت کی عظیم روایت میں شامل ہوں",
+    heroQuote: '”ہر ایک تعاون امید کی کرن بنتا ہے، جو ہمیں اہل بیت (ع) اور خواجہ غریب نواز (ع) کی ابدی تعلیمات کے سائے میں انسانیت کی خدمت کرنے کے قابل بناتا ہے۔“',
+    
+    // Humble Request Note
+    humbleRequestTitle: "ایک عاجزانہ گزارش",
+    humbleRequestDesc: "براہ کرم اپنے عطیات نذر و نیاز یا خمس (اگر لاگو ہو) کی صورت میں پیش فرمائیں۔ چونکہ یہ فاؤنڈیشن ساداتِ کرام کی بھی خدمت کرتی ہے، لہٰذا ہم ادب کے ساتھ گزارش کرتے ہیں کہ اس مقصد کے لیے زکوٰۃ، خیرات اور صدقہ کا عطیہ نہ دیا جائے۔",
+    btnUnderstand: "میں سمجھ گیا، آگے بڑھیں",
+    
+    // Donor Types
+    donorIndian: "ہندوستانی معطی",
+    donorNri: "این آر آئی معطی",
+    donorInternational: "بین الاقوامی معطی",
+    
+    // Frequency
+    frequencyLabel: "عطیہ کی قسم",
+    freqOnce: "ایک بار",
+    freqMonthly: "ماہانہ",
+    
+    // Cause
+    causeLabel: "عطیہ کا مقصد",
+    causes: {
+      "Where Needed Most": "جہاں سب سے زیادہ ضرورت ہو",
+      "Hussaini Langar Revival": "حسینی لنگر کا احیاء",
+      "Fatimi Langar": "فاطمی لنگر",
+      "Religious & Community Events": "مذہبی و سماجی تقریبات",
+      "General Charity": "عام فلاحی خدمات"
+    },
+    
+    // Amount
+    selectAmount: "رقم منتخب کریں",
+    currency: "ہندوستانی روپیہ (₹)",
+    customAmountPlaceholder: "اپنی مرضی کی رقم درج کریں",
+    btnProceed: "تفصیلات کی طرف آگے بڑھیں",
+    
+    // Step 2 Form
+    btnBack: "واپس",
+    donationAmountLabel: "عطیہ کی رقم",
+    fullNameLabel: "پورا نام",
+    fullNamePlaceholder: "اپنا پورا نام درج کریں",
+    emailLabel: "ای میل ایڈریس",
+    emailPlaceholder: "اپنا ای میل درج کریں",
+    mobileLabel: "موبائل نمبر",
+    mobilePlaceholder: "موبائل نمبر درج کریں",
+    countryLabel: "ملک",
+    countryPlaceholder: "مثلاً بھارت",
+    cityLabel: "شہر",
+    cityPlaceholder: "مثلاً ممبئی",
+    panLabel: "پین (PAN) نمبر",
+    panOptional: "(اختیاری)",
+    panPlaceholder: "80G انکم ٹیکس چھوٹ کے لیے",
+    
+    // 80G
+    taxExemptionTitle: "80G ٹیکس چھوٹ",
+    taxExemptionDesc: "کیا آپ کو اس عطیہ کے لیے 80G ٹیکس چھوٹ سرٹیفکیٹ درکار ہے؟",
+    yes: "جی ہاں",
+    no: "نہیں",
+    
+    // Prayer
+    prayerLabel: "دعا / التماسِ دعا",
+    prayerOptional: "(اختیاری)",
+    prayerPlaceholder: "اپنی دعائیہ نیت یا نام یہاں تحریر فرمائیں...",
+    btnCompleteDonation: "عطیہ مکمل کریں",
+    
+    // Payment Modal
+    securePayment: "محفوظ ادائیگی",
+    orderId: "آرڈر آئی ڈی",
+    totalAmount: "کل رقم",
+    encrypted100: "100% محفوظ اور انکرپٹڈ",
+    processingPayment: "ادائیگی کا عمل جاری ہے...",
+    processingWait: "براہ کرم اس ونڈو کو بند نہ کریں اور نہ ہی بیک کریں۔",
+    methods: {
+      upi: "یو پی آئی (UPI)",
+      upiSub: "GPay, PhonePe, Paytm, BHIM",
+      card: "کریڈٹ / ڈیبٹ کارڈ",
+      cardSub: "Visa, Mastercard, RuPay",
+      netbanking: "نیٹ بینکنگ",
+      netbankingSub: "تمام بڑے ہندوستانی بینکس",
+      wallet: "والیٹس",
+      walletSub: "Mobikwik, Freecharge، وغیرہ",
+      applepay: "ایپل پے",
+      applepaySub: "بین الاقوامی",
+      int_card: "بین الاقوامی کارڈز",
+      int_cardSub: "Amex, Diners، وغیرہ"
+    },
+    
+    // Success Step 4
+    successTitle: "عطیہ کامیابی سے مکمل ہوا!",
+    successDesc: "آپ کے پرخلوص اور فیاضانہ تعاون کا تہہ دل سے شکریہ، {name}۔ آپ کا ساتھ ہمارے اس عظیم مشن کو آگے بڑھانے میں بے حد مددگار ہے۔",
+    txnId: "ٹرانزیکشن آئی ڈی",
+    date: "تاریخ",
+    amount: "رقم",
+    cause: "مقصد",
+    btnReceipt: "رسید ڈاؤن لوڈ کریں",
+    btnShare: "شیئر کریں",
+    btnReturnHome: "مرکزی صفحہ پر واپس جائیں",
+    
+    // Alerts & Inline Validation
+    alertSelectAmount: "براہ کرم درست رقم منتخب کریں یا درج کریں (کم از کم ₹1)۔",
+    alertFillFields: "براہ کرم نیچے نشاندہی کردہ خانوں کو درست کریں۔",
+    alertInvalidEmail: "براہ کرم درست ای میل ایڈریس درج کریں (مثلاً name@gmail.com)۔",
+    alertInvalidMobile: "براہ کرم درست موبائل نمبر درج کریں۔",
+    alertInvalidPan: "براہ کرم درست 10 ہندسوں کا پین (PAN) نمبر درج کریں۔",
+    alertPanRequired80G: "80G ٹیکس چھوٹ سرٹیفکیٹ کے لیے پین نمبر لازمی ہے۔",
+    alertEnterUtr: "براہ کرم ادائیگی کے بعد ٹرانزیکشن آئی ڈی / UTR نمبر درج کریں۔",
+    errRequired: "یہ خانہ پُر کرنا لازمی ہے۔",
+    errInvalidName: "براہ کرم اپنا درست پورا نام درج کریں (کم از کم 2 حروف)۔",
+    errDisposableEmail: "عارضی یا جعلی ای میل ایڈریس قابل قبول نہیں ہیں۔ براہ کرم درست ای میل درج کریں۔",
+    errEmailTypo: "کیا آپ کی مراد {suggestion} ہے؟",
+    errEmailDomainUnreachable: "یہ ای میل ڈومین درست نہیں ہے یا اس پر ای میل موصول نہیں ہو سکتی۔ براہ کرم چیک کریں۔",
+    errNonDigits: "صرف ہندسے درج کریں (حروف یا علامات نہیں)۔",
+    errInvalidIndianMobile: "براہ کرم 6، 7، 8 یا 9 سے شروع ہونے والا درست 10 ہندسوں کا ہندوستانی موبائل نمبر درج کریں۔",
+    errInvalidMobileLength: "منتخب کردہ کنٹری کوڈ کے مطابق درست موبائل نمبر درج کریں۔",
+    errFakeMobilePattern: "ایک جیسے یا لگاتار نمبر (مثلاً 9999999999 یا 1234567890) قابل قبول نہیں ہیں۔",
+    errInvalidLocation: "براہ کرم درست نام درج کریں (کم از کم 2 حروف)۔",
+    verifyingDetailsLabel: "تفصیلات کی تصدیق جاری ہے...",
+
+    // Real Payment Flow
+    tabUpi: "یو پی آئی (UPI QR)",
+    tabBank: "بینک ٹرانسفر",
+    tabOnline: "کارڈ / نیٹ بینکنگ",
+    scanUpiTitle: "کسی بھی UPI ایپ سے اسکین کریں",
+    scanUpiDesc: "GPay، PhonePe، Paytm یا BHIM سے فوری ادائیگی کریں۔",
+    openUpiApp: "UPI ایپ کھولیں",
+    upiIdLabel: "فاؤنڈیشن UPI آئی ڈی",
+    copyLabel: "کاپی",
+    copiedLabel: "کاپی ہو گیا!",
+    utrStepTitle: "دوسرا مرحلہ: ریفرنس نمبر درج کریں",
+    utrLabel: "UPI ٹرانزیکشن آئی ڈی / UTR نمبر",
+    utrPlaceholder: "مثلاً 412345678901",
+    utrHelper: "ادائیگی کے بعد اپنی سرکاری رسید حاصل کرنے کے لیے 12 ہندسوں کا UTR نمبر درج کریں۔",
+    btnConfirmUtr: "تصدیق کریں اور رسید حاصل کریں",
+    submittingLabel: "ریکارڈ محفوظ ہو رہا ہے...",
+    bankDetailsTitle: "براہِ راست بینک ٹرانسفر (IMPS / NEFT / RTGS)",
+    bankAccHolder: "اکاؤنٹ ہولڈر",
+    bankNameLabel: "بینک کا نام",
+    bankAccNo: "اکاؤنٹ نمبر",
+    bankIfsc: "IFSC کوڈ",
+    bankAccType: "اکاؤنٹ کی قسم",
+    bankUtrLabel: "بینک ریفرنس / UTR نمبر",
+    bankUtrPlaceholder: "IMPS / NEFT ریفرنس نمبر درج کریں",
+    whatsappProofBtn: "واٹس ایپ پر اسکرین شاٹ بھیجیں",
+    gatewayCardsNote: "آن لائن کارڈ اور نیٹ بینکنگ ادائیگی",
+
+    // Receipt & Verification
+    receiptNoLabel: "رسید نمبر",
+    statusLabel: "اسٹیٹس",
+    statusVerified: "تصدیق شدہ",
+    statusPendingVerify: "ریکارڈ شدہ • بینک تصدیق زیرِ التواء",
+    paymentMethodLabel: "طریقہ کار",
+    methodUpi: "UPI ادائیگی",
+    methodBank: "بینک ٹرانسفر",
+    methodGateway: "آن لائن گیٹ وے",
+    donorNameLabel: "معطی کا نام",
+    shareCopiedMsg: "عطیہ کی تفصیلات کاپی ہو گئیں!",
+    btnMakeAnother: "ایک اور عطیہ پیش کریں",
+    verifyReceiptTitle: "اپنی عطیہ رسید کی تصدیق کریں",
+    verifyReceiptDesc: "اپنی رسید کا اسٹیٹس دیکھنے کے لیے رسید نمبر (مثلاً MGF-...) یا UTR نمبر درج کریں۔",
+    verifyReceiptPlaceholder: "رسید نمبر یا UTR / ٹرانزیکشن آئی ڈی درج کریں",
+    btnVerifyReceipt: "رسید چیک کریں",
+    verifyingReceipt: "تلاش جاری ہے...",
+    receiptVerifiedBanner: "فاؤنڈیشن کا سرکاری ریکارڈ مل گیا"
+  },
+
+  hi: {
+    heroTitle: "खिदमत की पावन परंपरा से जुड़ें",
+    heroQuote: '"हर योगदान उम्मीद का एक जरिया बनता है, जो हमें अहलुल बैत (अ.स.) और ख्वाजा गरीब नवाज़ (अ.स.) की पावन शिक्षाओं के अनुसार मानवता की सेवा करने में सक्षम बनाता है।"',
+    
+    // Humble Request Note
+    humbleRequestTitle: "एक विनम्र निवेदन",
+    humbleRequestDesc: "कृपया अपना योगदान नज़्र-ओ-नियाज़ या ख़ुम्स (यदि लागू हो) के रूप में दें। चूंकि यह फाउंडेशन सादात (सैयद समुदाय) की भी सेवा करता है, इसलिए हम सादर निवेदन करते हैं कि इस कार्य के लिए ज़कात, खैरात और सदक़ा का दान न दिया जाए।",
+    btnUnderstand: "मैं समझ गया, आगे बढ़ें",
+    
+    // Donor Types
+    donorIndian: "भारतीय दानकर्ता",
+    donorNri: "एनआरआई दानकर्ता",
+    donorInternational: "अंतर्राष्ट्रीय दानकर्ता",
+    
+    // Frequency
+    frequencyLabel: "दान का प्रकार",
+    freqOnce: "एक बार",
+    freqMonthly: "मासिक",
+    
+    // Cause
+    causeLabel: "दान का उद्देश्य",
+    causes: {
+      "Where Needed Most": "जहाँ सबसे अधिक आवश्यकता हो",
+      "Hussaini Langar Revival": "हुसैनी लंगर सेवा",
+      "Fatimi Langar": "फ़ातिमी लंगर",
+      "Religious & Community Events": "धार्मिक एवं सामुदायिक कार्यक्रम",
+      "General Charity": "सामान्य जनकल्याण"
+    },
+    
+    // Amount
+    selectAmount: "राशि चुनें",
+    currency: "भारतीय रुपया (₹)",
+    customAmountPlaceholder: "अपनी इच्छानुसार राशि दर्ज करें",
+    btnProceed: "विवरण दर्ज करने के लिए आगे बढ़ें",
+    
+    // Step 2 Form
+    btnBack: "वापस",
+    donationAmountLabel: "दान की राशि",
+    fullNameLabel: "पूरा नाम",
+    fullNamePlaceholder: "अपना पूरा नाम दर्ज करें",
+    emailLabel: "ईमेल पता",
+    emailPlaceholder: "अपना ईमेल दर्ज करें",
+    mobileLabel: "मोबाइल नंबर",
+    mobilePlaceholder: "मोबाइल नंबर दर्ज करें",
+    countryLabel: "देश",
+    countryPlaceholder: "जैसे: भारत",
+    cityLabel: "शहर",
+    cityPlaceholder: "जैसे: मुंबई",
+    panLabel: "पैन (PAN) नंबर",
+    panOptional: "(वैकल्पिक)",
+    panPlaceholder: "80G टैक्स छूट के लिए",
+    
+    // 80G
+    taxExemptionTitle: "80G टैक्स छूट",
+    taxExemptionDesc: "क्या आपको इस दान के लिए 80G टैक्स छूट प्रमाणपत्र चाहिए?",
+    yes: "हाँ",
+    no: "नहीं",
+    
+    // Prayer
+    prayerLabel: "दुआ / प्रार्थना का निवेदन",
+    prayerOptional: "(वैकल्पिक)",
+    prayerPlaceholder: "अपनी मनोकामना या दुआ के लिए नाम लिखें...",
+    btnCompleteDonation: "दान प्रक्रिया पूरी करें",
+    
+    // Payment Modal
+    securePayment: "सुरक्षित भुगतान",
+    orderId: "ऑर्डर आईडी",
+    totalAmount: "कुल राशि",
+    encrypted100: "100% सुरक्षित और एन्क्रिप्टेड",
+    processingPayment: "भुगतान प्रोसेस हो रहा है...",
+    processingWait: "कृपया इस विंडो को बंद न करें और न ही बैक दबाएं।",
+    methods: {
+      upi: "यूपीआई (UPI)",
+      upiSub: "GPay, PhonePe, Paytm, BHIM",
+      card: "क्रेडिट / डेबिट कार्ड",
+      cardSub: "Visa, Mastercard, RuPay",
+      netbanking: "नेट बैंकिंग",
+      netbankingSub: "सभी प्रमुख भारतीय बैंक",
+      wallet: "वॉलेट्स",
+      walletSub: "Mobikwik, Freecharge, आदि",
+      applepay: "एप्पल पे",
+      applepaySub: "अंतर्राष्ट्रीय",
+      int_card: "अंतर्राष्ट्रीय कार्ड",
+      int_cardSub: "Amex, Diners, आदि"
+    },
+    
+    // Success Step 4
+    successTitle: "दान सफलतापूर्वक संपन्न हुआ!",
+    successDesc: "आपके उदार सहयोग के लिए बहुत-बहुत धन्यवाद, {name}। आपका समर्थन हमें इस पावन मिशन को निरंतर आगे बढ़ाने में मदद करता है।",
+    txnId: "लेन-देन आईडी",
+    date: "दिनांक",
+    amount: "राशि",
+    cause: "उद्देश्य",
+    btnReceipt: "रसीद डाउनलोड करें",
+    btnShare: "शेयर करें",
+    btnReturnHome: "होमपेज पर वापस जाएं",
+    
+    // Alerts & Inline Validation
+    alertSelectAmount: "कृपया सही राशि चुनें या दर्ज करें (न्यूनतम ₹1)।",
+    alertFillFields: "कृपया नीचे दर्शाए गए फ़ील्ड को सही से भरें।",
+    alertInvalidEmail: "कृपया एक मान्य ईमेल पता दर्ज करें (जैसे: name@gmail.com)।",
+    alertInvalidMobile: "कृपया एक मान्य मोबाइल नंबर दर्ज करें।",
+    alertInvalidPan: "कृपया मान्य 10-अक्षरों का पैन (PAN) नंबर दर्ज करें।",
+    alertPanRequired80G: "80G टैक्स छूट प्रमाणपत्र के लिए पैन नंबर आवश्यक है।",
+    alertEnterUtr: "कृपया भुगतान के बाद अपना लेन-देन ID / UTR नंबर दर्ज करें।",
+    errRequired: "यह फ़ील्ड भरना आवश्यक है।",
+    errInvalidName: "कृपया अपना सही पूरा नाम दर्ज करें (कम से कम 2 अक्षर)।",
+    errDisposableEmail: "अस्थायी या नकली ईमेल पते मान्य नहीं हैं। कृपया अपना सक्रिय ईमेल दर्ज करें।",
+    errEmailTypo: "क्या आपका मतलब {suggestion} था?",
+    errEmailDomainUnreachable: "यह ईमेल डोमेन मान्य नहीं है या ईमेल प्राप्त नहीं कर सकता। कृपया जांचें।",
+    errNonDigits: "केवल अंक दर्ज करें (अक्षर या चिह्न नहीं)।",
+    errInvalidIndianMobile: "कृपया 6, 7, 8 या 9 से शुरू होने वाला सही 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें।",
+    errInvalidMobileLength: "चुने गए देश कोड के अनुसार सही मोबाइल नंबर दर्ज करें।",
+    errFakeMobilePattern: "एक जैसे या क्रमिक नंबर (जैसे 9999999999 या 1234567890) मान्य नहीं हैं। कृपया सही नंबर दर्ज करें।",
+    errInvalidLocation: "कृपया एक मान्य नाम दर्ज करें (कम से कम 2 अक्षर)।",
+    verifyingDetailsLabel: "विवरण सत्यापित हो रहा है...",
+
+    // Real Payment Flow
+    tabUpi: "यूपीआई (UPI QR)",
+    tabBank: "बैंक ट्रांसफर",
+    tabOnline: "कार्ड / नेट बैंकिंग",
+    scanUpiTitle: "किसी भी UPI ऐप से स्कैन करें",
+    scanUpiDesc: "GPay, PhonePe, Paytm या BHIM से तुरंत भुगतान करें।",
+    openUpiApp: "UPI ऐप खोलें",
+    upiIdLabel: "फाउंडेशन UPI आईडी",
+    copyLabel: "कॉपी",
+    copiedLabel: "कॉपी हो गया!",
+    utrStepTitle: "चरण 2: भुगतान संदर्भ दर्ज करें",
+    utrLabel: "UPI लेन-देन ID / UTR नंबर",
+    utrPlaceholder: "जैसे: 412345678901",
+    utrHelper: "भुगतान के बाद अपनी आधिकारिक रसीद प्राप्त करने के लिए 12 अंकों का UTR नंबर दर्ज करें।",
+    btnConfirmUtr: "पुष्टि करें और रसीद प्राप्त करें",
+    submittingLabel: "दान दर्ज किया जा रहा है...",
+    bankDetailsTitle: "सीधा बैंक ट्रांसफर (IMPS / NEFT / RTGS)",
+    bankAccHolder: "खाताधारक",
+    bankNameLabel: "बैंक का नाम",
+    bankAccNo: "खाता संख्या",
+    bankIfsc: "IFSC कोड",
+    bankAccType: "खाता प्रकार",
+    bankUtrLabel: "बैंक रेफरेंस / UTR नंबर",
+    bankUtrPlaceholder: "IMPS / NEFT रेफरेंस नंबर दर्ज करें",
+    whatsappProofBtn: "व्हाट्सएप पर स्क्रीनशॉट भेजें",
+    gatewayCardsNote: "ऑनलाइन कार्ड और नेट बैंकिंग भुगतान",
+
+    // Receipt & Verification
+    receiptNoLabel: "रसीद संख्या",
+    statusLabel: "स्थिति",
+    statusVerified: "सत्यापित",
+    statusPendingVerify: "दर्ज • बैंक सत्यापन लंबित",
+    paymentMethodLabel: "माध्यम",
+    methodUpi: "UPI भुगतान",
+    methodBank: "बैंक ट्रांसफर",
+    methodGateway: "ऑनलाइन गेटवे",
+    donorNameLabel: "दानकर्ता",
+    shareCopiedMsg: "दान विवरण क्लिपबोर्ड पर कॉपी हो गया!",
+    btnMakeAnother: "एक और दान करें",
+    verifyReceiptTitle: "मौजूदा दान रसीद सत्यापित करें",
+    verifyReceiptDesc: "आधिकारिक स्थिति जांचने के लिए अपना रसीद नंबर (जैसे MGF-...) या UTR नंबर दर्ज करें।",
+    verifyReceiptPlaceholder: "रसीद नंबर या UTR / लेन-देन ID दर्ज करें",
+    btnVerifyReceipt: "रसीद जांचें",
+    verifyingReceipt: "जांच हो रही है...",
+    receiptVerifiedBanner: "आधिकारिक फाउंडेशन रिकॉर्ड प्राप्त हुआ"
+  }
+};

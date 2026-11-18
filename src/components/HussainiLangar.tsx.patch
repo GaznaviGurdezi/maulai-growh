@@ -1,0 +1,42 @@
+--- src/components/HussainiLangar.tsx
++++ src/components/HussainiLangar.tsx
+@@ -155,41 +155,6 @@
+               </div>
+             </motion.div>
+           </div>
+-
+-                <img src="https://www.chishtiyasufifoundation.com/assets/img/team/langar1.jpg" alt={mt2.v4Title} className="w-full aspect-[5/3] object-cover transition-transform duration-700 group-hover:scale-105 rounded-3xl" />
+-              </div>
+-              <div className="w-full mt-3 md:mt-6 flex items-center justify-center gap-2 md:gap-4 px-1 md:px-4">
+-                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-[#ff3333]/50"></div>
+-                <p className={`text-[#ff3333] text-[10px] sm:text-[14px] md:text-lg tracking-wider sm:tracking-widest uppercase font-medium text-center ${t.fontClassSerif}`}>{mt2.v4Title}</p>
+-                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-[#ff3333]/50"></div>
+-              </div>
+-            </motion.div>
+-
+-            {/* Image 7 */}
+-            <motion.div
+-              initial={{ opacity: 0, y: 30 }}
+-              whileInView={{ opacity: 1, y: 0 }}
+-              viewport={{ once: true }}
+-              transition={{ duration: 0.8 }}
+-              className="flex flex-col items-center"
+-            >
+-              <div 
+-                onClick={() => setSelectedImage("/langar-fatimiyyah.png")}
+-                className="relative overflow-hidden rounded-3xl border border-[#ff3333]/30 bg-transparent group flex items-center justify-center cursor-pointer w-full"
+-              >
+-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-500 z-10 pointer-events-none"></div>
+-                <img src="/langar-fatimiyyah.png" alt={mt2.v5Title} className="w-full aspect-[5/3] object-cover transition-transform duration-700 group-hover:scale-105 rounded-3xl" />
+-              </div>
+-              <div className="w-full mt-3 md:mt-6 flex items-center justify-center gap-2 md:gap-4 px-1 md:px-4">
+-                <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-[#ff3333]/50"></div>
+-                <p className={`text-[#ff3333] text-[10px] sm:text-[14px] md:text-lg tracking-wider sm:tracking-widest uppercase font-medium text-center ${t.fontClassSerif}`}>{mt2.v5Title}</p>
+-                <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-[#ff3333]/50"></div>
+-              </div>
+-            </motion.div>
+-
+-          </div>
+         </div>
+         
+         {/* Our Vision Section */}

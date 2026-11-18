@@ -1,0 +1,6 @@
+{
+  "name": "Molai Growh",
+  "description": "Premium Shia Islamic website for Molai Growh with Ajmer Sharif Markaz as its spiritual headquarters.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
