@@ -10,7 +10,7 @@ export const leadershipTranslations = {
     l2Desc: "Shah Sufi Syed Yasir Hussain Gurdezi continues the family's tradition as a Khadim-e-Khawaja and Gaddi Nasheen, serving with dedication, sincerity, and commitment. Through religious, social, and welfare initiatives, he strives to uphold the spiritual heritage of Ajmer Sharif while promoting the message of unity, service, and love for Ahlul Bayt (AS). His efforts play an important role in strengthening community welfare and preserving cherished traditions.",
     l3Title: "CHAIRMAN",
     l3Name: "Shah Sufi Syed Gous Gaznavi Gurdezi",
-    l3Desc: "Shah Sufi Syed Gous Gaznavi Gurdezi serves as Chairman of MAULAI GROWH. As a Khadim-e-Khawaja and Gaddi Nasheen, he is dedicated to continuing the legacy of spiritual service, humanitarian work, and devotion to Ahlul Bayt (AS). His vision focuses on empowering communities, preserving Islamic values, supporting welfare initiatives, and strengthening the spiritual connection with the sacred heritage of Ajmer Sharif. Through leadership, service, and faith, he seeks to carry this legacy forward for future generations."
+    l3Desc: "Shah Sufi Syed Gous Gaznavi Gurdezi serves as Chairman of Maulai Growh Foundation. As a Khadim-e-Khawaja and Gaddi Nasheen, he is dedicated to continuing the legacy of spiritual service, humanitarian work, and devotion to Ahlul Bayt (AS). His vision focuses on empowering communities, preserving Islamic values, supporting welfare initiatives, and strengthening the spiritual connection with the sacred heritage of Ajmer Sharif. Through leadership, service, and faith, he seeks to carry this legacy forward for future generations."
   },
   ur: {
     title: "قیادت",
@@ -23,7 +23,7 @@ export const leadershipTranslations = {
     l2Desc: "شاہ صوفی سید یاسر حسین گردیزی ایک خادم خواجہ اور گدی نشین کی حیثیت سے خاندانی روایت کو لگن اور خلوص کے ساتھ جاری رکھے ہوئے ہیں۔ مذہبی، سماجی اور فلاحی اقدامات کے ذریعے، وہ اجمیر شریف کے روحانی ورثے کو برقرار رکھنے کے ساتھ ساتھ اتحاد، خدمت اور اہل بیت (ع) سے محبت کے پیغام کو عام کرنے کی کوشش کرتے ہیں۔ ان کی کوششیں کمیونٹی کی فلاح و بہبود کو مضبوط بنانے میں اہم کردار ادا کرتی ہیں۔",
     l3Title: "چیئرمین",
     l3Name: "شاہ صوفی سید غوث غزنوی گردیزی",
-    l3Desc: "شاہ صوفی سید غوث غزنوی گردیزی مولائی گروہ کے چیئرمین کے طور پر خدمات انجام دے رہے ہیں۔ ایک خادم خواجہ اور گدی نشین کے طور پر، وہ روحانی خدمت، فلاحی کاموں اور اہل بیت (ع) سے عقیدت کی میراث کو آگے بڑھانے کے لیے وقف ہیں۔ ان کا وژن کمیونٹیز کو بااختیار بنانے، اسلامی اقدار کے تحفظ، فلاحی اقدامات کی حمایت اور اجمیر شریف کے مقدس ورثے کے ساتھ روحانی تعلق کو مضبوط بنانے پر مرکوز ہے۔"
+    l3Desc: "شاہ صوفی سید غوث غزنوی گردیزی مولائی گروہ فاؤنڈیشن کے چیئرمین کے طور پر خدمات انجام دے رہے ہیں۔ ایک خادم خواجہ اور گدی نشین کے طور پر، وہ روحانی خدمت، فلاحی کاموں اور اہل بیت (ع) سے عقیدت کی میراث کو آگے بڑھانے کے لیے وقف ہیں۔ ان کا وژن کمیونٹیز کو بااختیار بنانے، اسلامی اقدار کے تحفظ، فلاحی اقدامات کی حمایت اور اجمیر شریف کے مقدس ورثے کے ساتھ روحانی تعلق کو مضبوط بنانے پر مرکوز ہے۔"
   },
   hi: {
     title: "नेतृत्व",
@@ -36,6 +36,6 @@ export const leadershipTranslations = {
     l2Desc: "शाह सूफी सैयद यासिर हुसैन गुरदेज़ी समर्पण, ईमानदारी और प्रतिबद्धता के साथ सेवा करते हुए खादिम-ए-ख्वाजा और गद्दी नशीन के रूप में परिवार की परंपरा को जारी रखे हुए हैं। धार्मिक, सामाजिक और कल्याणकारी पहलों के माध्यम से, वह अजमेर शरीफ की आध्यात्मिक विरासत को बनाए रखने और एकता, सेवा और अहल-ए-बैत (अ.स.) के लिए प्यार के संदेश को बढ़ावा देने का प्रयास करते हैं। उनके प्रयास सामुदायिक कल्याण को मजबूत करने में महत्वपूर्ण भूमिका निभाते हैं।",
     l3Title: "अध्यक्ष",
     l3Name: "शाह सूफी सैयद गौस गजनवी गुरदेज़ी",
-    l3Desc: "शाह सूफी सैयद गौस गजनवी गुरदेज़ी मौलाई गिरोह के अध्यक्ष के रूप में कार्य करते हैं। एक खादिम-ए-ख्वाजा और गद्दी नशीन के रूप में, वह आध्यात्मिक सेवा, मानवीय कार्य और अहल-ए-बैत (अ.स.) के प्रति भक्ति की विरासत को जारी रखने के लिए समर्पित हैं। उनका दृष्टिकोण समुदायों को सशक्त बनाने, इस्लामी मूल्यों को संरक्षित करने, कल्याणकारी पहलों का समर्थन करने और अजमेर शरीफ की पवित्र विरासत के साथ आध्यात्मिक संबंध को मजबूत करने पर केंद्रित है।"
+    l3Desc: "शाह सूफी सैयद गौस गजनवी गुरदेज़ी मौलाई ग्रोह फाउंडेशन के अध्यक्ष के रूप में कार्य करते हैं। एक खादिम-ए-ख्वाजा और गद्दी नशीन के रूप में, वह आध्यात्मिक सेवा, मानवीय कार्य और अहल-ए-बैत (अ.स.) के प्रति भक्ति की विरासत को जारी रखने के लिए समर्पित हैं। उनका दृष्टिकोण समुदायों को सशक्त बनाने, इस्लामी मूल्यों को संरक्षित करने, कल्याणकारी पहलों का समर्थन करने और अजमेर शरीफ की पवित्र विरासत के साथ आध्यात्मिक संबंध को मजबूत करने पर केंद्रित है।"
   }
 };

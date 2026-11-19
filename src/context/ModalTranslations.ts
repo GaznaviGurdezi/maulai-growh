@@ -37,7 +37,7 @@ export const modalTranslations = {
   },
   hi: {
     donationTitle: "दान",
-    supportTitle: "मौलाई गिरोह फाउंडेशन का समर्थन करें",
+    supportTitle: "मौलाई ग्रोह फाउंडेशन का समर्थन करें",
     onlinePayment: "ऑनलाइन भुगतान",
     creditDebitCard: "क्रेडिट / डेबिट कार्ड / पेपाल",
     upiQr: "यूपीआई भुगतान / क्यूआर",
@@ -49,7 +49,7 @@ export const modalTranslations = {
     bankNameTitle: "बैंक",
     bankName: "इस्लामिक बैंक लिमिटेड",
     accountTitleLabel: "खाता शीर्षक",
-    accountTitle: "मौलाई गिरोह फाउंडेशन",
+    accountTitle: "मौलाई ग्रोह फाउंडेशन",
     ibanTitle: "IBAN",
     contributionText: "आपका योगदान हमें मानवता की सेवा करने में मदद करता है।"
   }

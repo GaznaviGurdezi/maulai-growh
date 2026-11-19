@@ -1,6 +1,6 @@
 export const missionTranslations = {
   en: {
-    intro: "At Maulai Growh, our mission is inspired by the teachings of the Holy Ahl al-Bayt (A.S.), the message of humanity of Imam Hussain (A.S.), and the spirit of service associated with Khwaja Gharib Nawaz (A.S.).",
+    intro: "At Maulai Growh Foundation, our mission is inspired by the teachings of the Holy Ahl al-Bayt (A.S.), the message of humanity of Imam Hussain (A.S.), and the spirit of service associated with Khwaja Gharib Nawaz (A.S.).",
     dream: "We dream of a society where:",
     v1Title: "No One Sleeps Hungry",
     v1Text: "We strive to ensure that no person in our community goes to bed hungry. Through food distribution programs, community kitchens, and the revival of humanitarian langar traditions, we aim to provide nutritious meals to those in need with dignity and respect.",
@@ -24,7 +24,7 @@ export const missionTranslations = {
     quoteSub: "Serving humanity is the highest form of devotion."
   },
   ur: {
-    intro: "مولائی گروہ میں، ہمارا مشن مقدس اہل بیت (ع) کی تعلیمات، امام حسین (ع) کے انسانیت کے پیغام، اور خواجہ غریب نواز (ع) سے وابستہ خدمت کے جذبے سے متاثر ہے۔",
+    intro: "مولائی گروہ فاؤنڈیشن میں، ہمارا مشن مقدس اہل بیت (ع) کی تعلیمات، امام حسین (ع) کے انسانیت کے پیغام، اور خواجہ غریب نواز (ع) سے وابستہ خدمت کے جذبے سے متاثر ہے۔",
     dream: "ہم ایک ایسے معاشرے کا خواب دیکھتے ہیں جہاں:",
     v1Title: "کوئی بھوکا نہ سوئے",
     v1Text: "ہماری کوشش ہے کہ ہماری کمیونٹی میں کوئی بھی شخص بھوکا نہ سوئے۔ خوراک کی تقسیم کے پروگراموں، کمیونٹی کچن اور انسانی لنگر کی روایات کے احیاء کے ذریعے، ہمارا مقصد ضرورت مندوں کو وقار اور احترام کے ساتھ غذائیت سے بھرپور کھانا فراہم کرنا ہے۔",
@@ -48,7 +48,7 @@ export const missionTranslations = {
     quoteSub: "انسانیت کی خدمت عقیدت کی اعلیٰ ترین شکل ہے۔"
   },
   hi: {
-    intro: "मौलाई गिरोह में, हमारा मिशन पवित्र अहल-ए-बैत (अ.स.) की शिक्षाओं, इमाम हुसैन (अ.स.) के मानवता के संदेश और ख्वाजा गरीब नवाज (अ.स.) से जुड़ी सेवा की भावना से प्रेरित है।",
+    intro: "मौलाई ग्रोह फाउंडेशन में, हमारा मिशन पवित्र अहल-ए-बैत (अ.स.) की शिक्षाओं, इमाम हुसैन (अ.स.) के मानवता के संदेश और ख्वाजा गरीब नवाज (अ.स.) से जुड़ी सेवा की भावना से प्रेरित है।",
     dream: "हम एक ऐसे समाज का सपना देखते हैं जहां:",
     v1Title: "कोई भूखा न सोए",
     v1Text: "हम यह सुनिश्चित करने का प्रयास करते हैं कि हमारे समुदाय में कोई भी व्यक्ति भूखा न सोए। भोजन वितरण कार्यक्रमों, सामुदायिक रसोई और मानवीय लंगर परंपराओं के पुनरुद्धार के माध्यम से, हम जरूरतमंदों को गरिमा और सम्मान के साथ पौष्टिक भोजन प्रदान करना चाहते हैं।",

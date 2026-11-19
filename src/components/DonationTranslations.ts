@@ -160,7 +160,12 @@ export const donationTranslations = {
     verifyReceiptPlaceholder: "Enter Receipt No. or UTR / Transaction ID",
     btnVerifyReceipt: "Verify Receipt",
     verifyingReceipt: "Checking...",
-    receiptVerifiedBanner: "Official Foundation Record Found"
+    receiptVerifiedBanner: "Official Foundation Record Found",
+    searchCodePlaceholder: "Search country or +code...",
+    searchCountryHint: "Select or type country",
+    searchCityHint: "Select or type city",
+    noMatchingResults: "No matches found",
+    useCustomCity: "Use custom city:"
   },
 
   ur: {
@@ -324,7 +329,12 @@ export const donationTranslations = {
     verifyReceiptPlaceholder: "رسید نمبر یا UTR / ٹرانزیکشن آئی ڈی درج کریں",
     btnVerifyReceipt: "رسید چیک کریں",
     verifyingReceipt: "تلاش جاری ہے...",
-    receiptVerifiedBanner: "فاؤنڈیشن کا سرکاری ریکارڈ مل گیا"
+    receiptVerifiedBanner: "فاؤنڈیشن کا سرکاری ریکارڈ مل گیا",
+    searchCodePlaceholder: "ملک یا کوڈ تلاش کریں...",
+    searchCountryHint: "ملک منتخب کریں یا لکھیں",
+    searchCityHint: "شہر منتخب کریں یا لکھیں",
+    noMatchingResults: "کوئی نتیجہ نہیں ملا",
+    useCustomCity: "یہ شہر استعمال کریں:"
   },
 
   hi: {
@@ -488,6 +498,11 @@ export const donationTranslations = {
     verifyReceiptPlaceholder: "रसीद नंबर या UTR / लेन-देन ID दर्ज करें",
     btnVerifyReceipt: "रसीद जांचें",
     verifyingReceipt: "जांच हो रही है...",
-    receiptVerifiedBanner: "आधिकारिक फाउंडेशन रिकॉर्ड प्राप्त हुआ"
+    receiptVerifiedBanner: "आधिकारिक फाउंडेशन रिकॉर्ड प्राप्त हुआ",
+    searchCodePlaceholder: "देश या +कोड खोजें...",
+    searchCountryHint: "देश चुनें या लिखें",
+    searchCityHint: "शहर चुनें या लिखें",
+    noMatchingResults: "कोई परिणाम नहीं मिला",
+    useCustomCity: "यह शहर उपयोग करें:"
   }
 };

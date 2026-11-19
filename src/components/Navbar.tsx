@@ -135,7 +135,7 @@ export function Navbar() {
                 <div className={`relative flex-shrink-0 rounded-full border-2 border-brand-gold/60 shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-black flex items-center justify-center overflow-hidden transition-all duration-500 ease-in-out ${isScrolled ? "w-10 h-10 md:w-12 md:h-12" : "w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16"}`}>
                   <img
                     src="/logo.png"
-                    alt="Maulai Growh Logo"
+                    alt="Maulai Growh Foundation Logo"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                 </div>

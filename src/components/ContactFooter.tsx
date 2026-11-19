@@ -53,7 +53,7 @@ export function ContactFooter() {
         {/* 4 Column Layout */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
           
-          {/* Column 1: About Maulai Growh */}
+          {/* Column 1: About Maulai Growh Foundation */}
           <motion.div
              initial={{ opacity: 0, y: 20 }}
              whileInView={{ opacity: 1, y: 0 }}

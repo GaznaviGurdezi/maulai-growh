@@ -49,7 +49,7 @@ const translations = {
     cta: "ہمارا مشن دریافت کریں"
   },
   hi: {
-    foundation: "मौलाई गिरोह फाउंडेशन",
+    foundation: "मौलाई ग्रोह फाउंडेशन",
     subTitle: "मानवता की सेवा",
     titleStart: "खिदमत का",
     titleHighlight: "जज़्बा",

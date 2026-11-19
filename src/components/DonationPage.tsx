@@ -1,22 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Heart, ArrowRight, ShieldCheck, CheckCircle2,
-  AlertCircle, ChevronLeft, CreditCard, Smartphone,
+  AlertCircle, ChevronLeft, ChevronDown, CreditCard, Smartphone,
   Landmark, Wallet, Download, Share2, X, Copy, Check,
-  ExternalLink, Search, MessageCircle, Clock
+  ExternalLink, Search, MessageCircle, Clock, MapPin
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { donationTranslations } from './DonationTranslations';
 import {
   FieldErrorCode,
+  getMobileMaxLength,
   validateEmailAddress,
   validateFullName,
   validateLocationText,
   validateMobileNumber,
   validatePanNumber,
 } from '../utils/donationValidation';
+import {
+  CountryLocation,
+  WORLD_LOCATIONS,
+  findCountryByDialCode,
+  findCountryByName,
+  getCitiesForCountry,
+} from '../data/locationsData';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -159,6 +167,167 @@ export function DonationPage() {
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupError, setLookupError] = useState('');
   const [lookupResult, setLookupResult] = useState<DonationReceipt | null>(null);
+
+  // Searchable dropdown states for Country Code, Country, and City
+  const [codeDropdownOpen, setCodeDropdownOpen] = useState(false);
+  const [codeSearch, setCodeSearch] = useState('');
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [countrySearchTouched, setCountrySearchTouched] = useState(false);
+  const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
+  const [citySearchTouched, setCitySearchTouched] = useState(false);
+
+  const codeDropdownRef = useRef<HTMLDivElement>(null);
+  const codeSearchInputRef = useRef<HTMLInputElement>(null);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
+  const cityDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (codeDropdownRef.current && !codeDropdownRef.current.contains(target)) {
+        setCodeDropdownOpen(false);
+      }
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(target)) {
+        setCountryDropdownOpen(false);
+        setCountrySearchTouched(false);
+      }
+      if (cityDropdownRef.current && !cityDropdownRef.current.contains(target)) {
+        setCityDropdownOpen(false);
+        setCitySearchTouched(false);
+      }
+    };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setCodeDropdownOpen(false);
+        setCountryDropdownOpen(false);
+        setCityDropdownOpen(false);
+        setCountrySearchTouched(false);
+        setCitySearchTouched(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (codeDropdownOpen) {
+      setTimeout(() => codeSearchInputRef.current?.focus(), 20);
+    } else {
+      setCodeSearch('');
+    }
+  }, [codeDropdownOpen]);
+
+  const activeDialCountry = useMemo(
+    () => findCountryByDialCode(details.countryCode, details.country),
+    [details.countryCode, details.country]
+  );
+
+  const filteredDialCountries = useMemo(() => {
+    const q = codeSearch.trim().toLowerCase();
+    if (!q) return WORLD_LOCATIONS;
+    return WORLD_LOCATIONS.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.dialCode.includes(q) ||
+        c.dialCode.replace('+', '').includes(q.replace('+', '')) ||
+        c.iso.toLowerCase().includes(q)
+    );
+  }, [codeSearch]);
+
+  const filteredCountries = useMemo(() => {
+    const q = countrySearchTouched ? details.country.trim().toLowerCase() : '';
+    if (!q) return WORLD_LOCATIONS;
+    return WORLD_LOCATIONS.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.iso.toLowerCase().includes(q) ||
+        c.dialCode.includes(q)
+    );
+  }, [details.country, countrySearchTouched]);
+
+  const availableCities = useMemo(
+    () => getCitiesForCountry(details.country),
+    [details.country]
+  );
+
+  const filteredCities = useMemo(() => {
+    const q = citySearchTouched ? details.city.trim().toLowerCase() : '';
+    if (!q) return availableCities;
+    return availableCities.filter((city) => city.toLowerCase().includes(q));
+  }, [availableCities, details.city, citySearchTouched]);
+
+  const matchedCountryObj = useMemo(
+    () => findCountryByName(details.country),
+    [details.country]
+  );
+
+  const handleSelectCountry = (loc: CountryLocation) => {
+    const cityStillValid = loc.cities.some(
+      (c) => c.toLowerCase() === details.city.trim().toLowerCase()
+    );
+    const next = {
+      ...details,
+      country: loc.name,
+      countryCode: loc.dialCode,
+      city: cityStillValid ? details.city : ''
+    };
+    setDetails(next);
+    setCountryDropdownOpen(false);
+    setCountrySearchTouched(false);
+    setFieldErrors((prev) => {
+      const updated = { ...prev };
+      delete updated.country;
+      return updated;
+    });
+    if (next.mobile) validateSingleField('mobile', next);
+    if (step2Error) setStep2Error('');
+  };
+
+  const handleSelectDialCode = (loc: CountryLocation) => {
+    const cityStillValid = loc.cities.some(
+      (c) => c.toLowerCase() === details.city.trim().toLowerCase()
+    );
+    const next = {
+      ...details,
+      countryCode: loc.dialCode,
+      country: loc.name,
+      city: details.country.trim().toLowerCase() === loc.name.toLowerCase() || cityStillValid ? details.city : ''
+    };
+    setDetails(next);
+    setCodeDropdownOpen(false);
+    setFieldErrors((prev) => {
+      const updated = { ...prev };
+      delete updated.country;
+      return updated;
+    });
+    if (next.mobile) validateSingleField('mobile', next);
+    if (step2Error) setStep2Error('');
+  };
+
+  const handleSelectCity = (cityName: string) => {
+    const next = { ...details, city: cityName };
+    setDetails(next);
+    setCityDropdownOpen(false);
+    setCitySearchTouched(false);
+    setFieldErrors((prev) => {
+      const updated = { ...prev };
+      delete updated.city;
+      return updated;
+    });
+    if (step2Error) setStep2Error('');
+  };
+
+  const chevronBgStyle: React.CSSProperties = {
+    backgroundImage:
+      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: isUrdu ? 'left 14px center' : 'right 14px center',
+    backgroundSize: '16px 16px',
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -620,7 +789,7 @@ export function DonationPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Maulai-Growh-Receipt-${receiptData.receiptNumber}.html`;
+    link.download = `Maulai-Growh-Foundation-Receipt-${receiptData.receiptNumber}.html`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -951,7 +1120,7 @@ export function DonationPage() {
                   >
                     <img
                       src="/logo.png"
-                      alt="Maulai Growh Logo"
+                      alt="Maulai Growh Foundation Logo"
                       className="w-full h-full object-cover transition-all duration-300"
                     />
                   </div>
@@ -1743,40 +1912,44 @@ export function DonationPage() {
                       )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative" ref={codeDropdownRef}>
                       <label
                         className="text-xs md:text-sm text-gray-400 uppercase tracking-[0.1em] md:tracking-widest font-bold flex gap-1"
                         style={isUrdu ? { fontFamily: 'Georgia, serif', fontSize: '24px' } : { fontSize: '18px' }}
                       >
                         {dt.mobileLabel} <span className="text-brand-crimson">*</span>
                       </label>
-                      <div className="flex gap-2">
-                        <select
-                          value={details.countryCode}
-                          onChange={(e) => {
-                            const next = { ...details, countryCode: e.target.value };
-                            setDetails(next);
-                            if (next.mobile) validateSingleField('mobile', next);
+                      <div className="flex gap-2 relative">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCodeDropdownOpen((prev) => !prev);
+                            setCountryDropdownOpen(false);
+                            setCityDropdownOpen(false);
                           }}
-                          className="w-24 bg-black/50 border border-white/10 rounded-xl px-2 py-3 text-sm md:text-base text-white focus:outline-none focus:border-brand-gold transition-colors appearance-none text-center cursor-pointer"
-                          style={{ fontSize: '18px' }}
+                          aria-haspopup="listbox"
+                          aria-expanded={codeDropdownOpen}
+                          className={`w-[108px] sm:w-[118px] shrink-0 bg-black/50 border rounded-xl px-2.5 py-3 text-sm md:text-base text-white flex items-center justify-between gap-1.5 focus:outline-none transition-colors cursor-pointer ${
+                            codeDropdownOpen
+                              ? 'border-brand-gold bg-black/80'
+                              : 'border-white/10 hover:border-brand-gold/50'
+                          }`}
+                          style={{ fontSize: '16px' }}
                         >
-                          <option value="+91">+91</option>
-                          <option value="+971">+971</option>
-                          <option value="+966">+966</option>
-                          <option value="+1">+1</option>
-                          <option value="+44">+44</option>
-                          <option value="+974">+974</option>
-                          <option value="+965">+965</option>
-                          <option value="+968">+968</option>
-                          <option value="+61">+61</option>
-                          <option value="+65">+65</option>
-                        </select>
+                          <span className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-base leading-none">{activeDialCountry.flag}</span>
+                            <span className="font-mono font-semibold text-white truncate">{details.countryCode}</span>
+                          </span>
+                          <ChevronDown
+                            size={15}
+                            className={`text-brand-gold shrink-0 transition-transform duration-200 ${codeDropdownOpen ? 'rotate-180' : ''}`}
+                          />
+                        </button>
                         <input
                           type="tel"
                           inputMode="numeric"
                           autoComplete="tel-national"
-                          maxLength={details.countryCode === '+91' ? 10 : 15}
+                          maxLength={getMobileMaxLength(details.countryCode)}
                           value={details.mobile}
                           onChange={(e) => {
                             const digitsOnly = e.target.value.replace(/\D/g, '');
@@ -1787,7 +1960,7 @@ export function DonationPage() {
                           }}
                           onBlur={() => validateSingleField('mobile')}
                           aria-invalid={Boolean(fieldErrors.mobile)}
-                          className={`flex-1 bg-black/50 border rounded-xl px-4 py-3 text-sm md:text-base text-white focus:outline-none transition-colors placeholder:text-gray-700 ${
+                          className={`flex-1 min-w-0 bg-black/50 border rounded-xl px-4 py-3 text-sm md:text-base text-white focus:outline-none transition-colors placeholder:text-gray-700 ${
                             fieldErrors.mobile
                               ? 'border-red-500/80 focus:border-red-500'
                               : 'border-white/10 focus:border-brand-gold'
@@ -1795,13 +1968,78 @@ export function DonationPage() {
                           placeholder={dt.mobilePlaceholder}
                           style={isUrdu ? { fontSize: '19px', fontFamily: "'Noto Nastaliq Urdu', serif" } : { fontSize: '18px' }}
                         />
+                        {codeDropdownOpen && (
+                          <div
+                            className={`absolute top-full ${isUrdu ? 'right-0' : 'left-0'} mt-1.5 w-[275px] sm:w-[310px] z-50 rounded-xl bg-[#111111] border border-brand-gold/35 shadow-[0_20px_50px_rgba(0,0,0,0.85)] overflow-hidden`}
+                            dir="ltr"
+                          >
+                            <div className="p-2 border-b border-white/10 bg-black/60">
+                              <div className="flex items-center gap-2 bg-black/80 border border-white/10 focus-within:border-brand-gold/70 rounded-lg px-2.5 py-2">
+                                <Search size={14} className="text-brand-gold shrink-0" />
+                                <input
+                                  ref={codeSearchInputRef}
+                                  type="text"
+                                  value={codeSearch}
+                                  onChange={(e) => setCodeSearch(e.target.value)}
+                                  placeholder={dt.searchCodePlaceholder}
+                                  className="w-full bg-transparent text-xs sm:text-sm text-white placeholder:text-gray-500 focus:outline-none"
+                                />
+                                {codeSearch && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setCodeSearch('')}
+                                    className="text-gray-500 hover:text-white cursor-pointer"
+                                  >
+                                    <X size={13} />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                            <ul className="max-h-60 overflow-y-auto py-1 divide-y divide-white/[0.04]" role="listbox">
+                              {filteredDialCountries.length > 0 ? (
+                                filteredDialCountries.map((loc) => {
+                                  const isSelected =
+                                    loc.dialCode === details.countryCode &&
+                                    loc.iso === activeDialCountry.iso;
+                                  return (
+                                    <li key={loc.iso}>
+                                      <button
+                                        type="button"
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => handleSelectDialCode(loc)}
+                                        className={`w-full px-3 py-2.5 flex items-center justify-between gap-2 text-left text-xs sm:text-sm transition-colors cursor-pointer ${
+                                          isSelected
+                                            ? 'bg-brand-gold/15 text-brand-gold font-semibold'
+                                            : 'text-gray-200 hover:bg-white/5 hover:text-white'
+                                        }`}
+                                      >
+                                        <span className="flex items-center gap-2.5 min-w-0">
+                                          <span className="text-base leading-none shrink-0">{loc.flag}</span>
+                                          <span className="truncate">{loc.name}</span>
+                                        </span>
+                                        <span className="flex items-center gap-1.5 shrink-0">
+                                          <span className="font-mono text-xs text-brand-gold/90">{loc.dialCode}</span>
+                                          {isSelected && <Check size={13} className="text-brand-gold" />}
+                                        </span>
+                                      </button>
+                                    </li>
+                                  );
+                                })
+                              ) : (
+                                <li className="px-3 py-4 text-center text-xs text-gray-500">
+                                  {dt.noMatchingResults}
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                       {fieldErrors.mobile && (
                         <p className="text-xs text-red-400 mt-1">{fieldErrors.mobile}</p>
                       )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative" ref={countryDropdownRef}>
                       <label
                         className="text-xs md:text-sm text-gray-400 uppercase tracking-[0.1em] md:tracking-widest font-bold flex gap-1"
                         style={isUrdu ? { fontSize: '24px', fontFamily: 'Georgia, serif' } : { fontSize: '18px' }}
@@ -1810,31 +2048,112 @@ export function DonationPage() {
                       </label>
                       <input
                         type="text"
+                        autoComplete="off"
                         value={details.country}
+                        onFocus={() => {
+                          setCountryDropdownOpen(true);
+                          setCountrySearchTouched(false);
+                          setCodeDropdownOpen(false);
+                          setCityDropdownOpen(false);
+                        }}
+                        onClick={() => {
+                          setCountryDropdownOpen(true);
+                          setCodeDropdownOpen(false);
+                          setCityDropdownOpen(false);
+                        }}
                         onChange={(e) => {
-                          const next = { ...details, country: e.target.value };
+                          const nextVal = e.target.value;
+                          const matched = findCountryByName(nextVal);
+                          const next = {
+                            ...details,
+                            country: nextVal,
+                            ...(matched ? { countryCode: matched.dialCode } : {})
+                          };
                           setDetails(next);
+                          setCountryDropdownOpen(true);
+                          setCountrySearchTouched(true);
                           if (fieldErrors.country) validateSingleField('country', next);
                           if (step2Error) setStep2Error('');
                         }}
                         onBlur={() => validateSingleField('country')}
                         aria-invalid={Boolean(fieldErrors.country)}
-                        className={`w-full bg-black/50 border rounded-lg md:rounded-xl px-4 py-3 md:py-3.5 text-sm md:text-base text-white focus:outline-none transition-colors placeholder:text-gray-700 ${
+                        aria-expanded={countryDropdownOpen}
+                        aria-autocomplete="list"
+                        className={`w-full bg-black/50 border rounded-lg md:rounded-xl ${isUrdu ? 'pl-10 pr-4' : 'pl-4 pr-10'} py-3 md:py-3.5 text-sm md:text-base text-white focus:outline-none transition-colors placeholder:text-gray-700 ${
                           fieldErrors.country
                             ? 'border-red-500/80 focus:border-red-500'
+                            : countryDropdownOpen
+                            ? 'border-brand-gold'
                             : 'border-white/10 focus:border-brand-gold'
                         }`}
                         placeholder={dt.countryPlaceholder}
                         dir={isUrdu ? 'rtl' : undefined}
                         lang={isUrdu ? 'ur' : undefined}
-                        style={isUrdu ? { fontFamily: "'Noto Nastaliq Urdu', 'Noto Naskh Arabic', serif", fontSize: '19px', lineHeight: '2.2', letterSpacing: '0px', unicodeBidi: 'plaintext' } : { fontSize: '18px' }}
+                        style={
+                          isUrdu
+                            ? {
+                                ...chevronBgStyle,
+                                fontFamily: "'Noto Nastaliq Urdu', 'Noto Naskh Arabic', serif",
+                                fontSize: '19px',
+                                lineHeight: '2.2',
+                                letterSpacing: '0px',
+                                unicodeBidi: 'plaintext',
+                              }
+                            : { ...chevronBgStyle, fontSize: '18px' }
+                        }
                       />
+                      {countryDropdownOpen && (
+                        <div
+                          className="absolute left-0 right-0 z-50 mt-1 rounded-xl bg-[#111111] border border-brand-gold/35 shadow-[0_20px_50px_rgba(0,0,0,0.85)] overflow-hidden"
+                          dir="ltr"
+                        >
+                          <div className="px-3 py-1.5 border-b border-white/10 bg-black/60 flex items-center justify-between text-[11px] uppercase tracking-wider text-gray-400">
+                            <span>{dt.searchCountryHint}</span>
+                            <span className="text-brand-gold/80 font-mono">{filteredCountries.length}</span>
+                          </div>
+                          <ul className="max-h-60 overflow-y-auto py-1 divide-y divide-white/[0.04]" role="listbox">
+                            {filteredCountries.length > 0 ? (
+                              filteredCountries.map((loc) => {
+                                const isSelected =
+                                  details.country.trim().toLowerCase() === loc.name.toLowerCase();
+                                return (
+                                  <li key={loc.iso}>
+                                    <button
+                                      type="button"
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={() => handleSelectCountry(loc)}
+                                      className={`w-full px-3.5 py-2.5 flex items-center justify-between gap-2 text-left text-xs sm:text-sm transition-colors cursor-pointer ${
+                                        isSelected
+                                          ? 'bg-brand-gold/15 text-brand-gold font-semibold'
+                                          : 'text-gray-200 hover:bg-white/5 hover:text-white'
+                                      }`}
+                                    >
+                                      <span className="flex items-center gap-2.5 min-w-0">
+                                        <span className="text-base leading-none shrink-0">{loc.flag}</span>
+                                        <span className="truncate">{loc.name}</span>
+                                      </span>
+                                      <span className="flex items-center gap-1.5 shrink-0">
+                                        <span className="font-mono text-xs text-gray-400">{loc.dialCode}</span>
+                                        {isSelected && <Check size={13} className="text-brand-gold" />}
+                                      </span>
+                                    </button>
+                                  </li>
+                                );
+                              })
+                            ) : (
+                              <li className="px-3.5 py-3 text-center text-xs text-gray-500">
+                                {dt.noMatchingResults}
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
                       {fieldErrors.country && (
                         <p className="text-xs text-red-400 mt-1">{fieldErrors.country}</p>
                       )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative" ref={cityDropdownRef}>
                       <label
                         className="text-xs md:text-sm text-gray-400 uppercase tracking-[0.1em] md:tracking-widest font-bold flex gap-1"
                         style={isUrdu ? { fontSize: '24px', fontFamily: 'Georgia, serif' } : { fontSize: '18px' }}
@@ -1843,25 +2162,118 @@ export function DonationPage() {
                       </label>
                       <input
                         type="text"
+                        autoComplete="off"
                         value={details.city}
+                        onFocus={() => {
+                          setCityDropdownOpen(true);
+                          setCitySearchTouched(false);
+                          setCodeDropdownOpen(false);
+                          setCountryDropdownOpen(false);
+                        }}
+                        onClick={() => {
+                          setCityDropdownOpen(true);
+                          setCodeDropdownOpen(false);
+                          setCountryDropdownOpen(false);
+                        }}
                         onChange={(e) => {
                           const next = { ...details, city: e.target.value };
                           setDetails(next);
+                          setCityDropdownOpen(true);
+                          setCitySearchTouched(true);
                           if (fieldErrors.city) validateSingleField('city', next);
                           if (step2Error) setStep2Error('');
                         }}
                         onBlur={() => validateSingleField('city')}
                         aria-invalid={Boolean(fieldErrors.city)}
-                        className={`w-full bg-black/50 border rounded-lg md:rounded-xl px-4 py-3 md:py-3.5 text-sm md:text-base text-white focus:outline-none transition-colors placeholder:text-gray-700 ${
+                        aria-expanded={cityDropdownOpen}
+                        aria-autocomplete="list"
+                        className={`w-full bg-black/50 border rounded-lg md:rounded-xl ${isUrdu ? 'pl-10 pr-4' : 'pl-4 pr-10'} py-3 md:py-3.5 text-sm md:text-base text-white focus:outline-none transition-colors placeholder:text-gray-700 ${
                           fieldErrors.city
                             ? 'border-red-500/80 focus:border-red-500'
+                            : cityDropdownOpen
+                            ? 'border-brand-gold'
                             : 'border-white/10 focus:border-brand-gold'
                         }`}
                         placeholder={dt.cityPlaceholder}
                         dir={isUrdu ? 'rtl' : undefined}
                         lang={isUrdu ? 'ur' : undefined}
-                        style={isUrdu ? { fontFamily: "'Noto Nastaliq Urdu', 'Noto Naskh Arabic', serif", fontSize: '19px', lineHeight: '2.2', letterSpacing: '0px', unicodeBidi: 'plaintext' } : { fontSize: '18px' }}
+                        style={
+                          isUrdu
+                            ? {
+                                ...chevronBgStyle,
+                                fontFamily: "'Noto Nastaliq Urdu', 'Noto Naskh Arabic', serif",
+                                fontSize: '19px',
+                                lineHeight: '2.2',
+                                letterSpacing: '0px',
+                                unicodeBidi: 'plaintext',
+                              }
+                            : { ...chevronBgStyle, fontSize: '18px' }
+                        }
                       />
+                      {cityDropdownOpen && (
+                        <div
+                          className="absolute left-0 right-0 z-50 mt-1 rounded-xl bg-[#111111] border border-brand-gold/35 shadow-[0_20px_50px_rgba(0,0,0,0.85)] overflow-hidden"
+                          dir="ltr"
+                        >
+                          <div className="px-3 py-1.5 border-b border-white/10 bg-black/60 flex items-center justify-between text-[11px] uppercase tracking-wider text-gray-400">
+                            <span className="truncate">
+                              {matchedCountryObj
+                                ? `${matchedCountryObj.flag} ${matchedCountryObj.name}`
+                                : dt.searchCityHint}
+                            </span>
+                            <span className="text-brand-gold/80 font-mono shrink-0">{filteredCities.length}</span>
+                          </div>
+                          <ul className="max-h-60 overflow-y-auto py-1 divide-y divide-white/[0.04]" role="listbox">
+                            {filteredCities.map((cityName) => {
+                              const isSelected =
+                                details.city.trim().toLowerCase() === cityName.toLowerCase();
+                              return (
+                                <li key={cityName}>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => handleSelectCity(cityName)}
+                                    className={`w-full px-3.5 py-2.5 flex items-center justify-between gap-2 text-left text-xs sm:text-sm transition-colors cursor-pointer ${
+                                      isSelected
+                                        ? 'bg-brand-gold/15 text-brand-gold font-semibold'
+                                        : 'text-gray-200 hover:bg-white/5 hover:text-white'
+                                    }`}
+                                  >
+                                    <span className="flex items-center gap-2 min-w-0">
+                                      <MapPin size={13} className="text-brand-gold/70 shrink-0" />
+                                      <span className="truncate">{cityName}</span>
+                                    </span>
+                                    {isSelected && <Check size={13} className="text-brand-gold shrink-0" />}
+                                  </button>
+                                </li>
+                              );
+                            })}
+                            {details.city.trim().length >= 2 &&
+                              !availableCities.some(
+                                (c) => c.toLowerCase() === details.city.trim().toLowerCase()
+                              ) && (
+                                <li>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => handleSelectCity(details.city.trim())}
+                                    className="w-full px-3.5 py-2.5 flex items-center gap-2 text-left text-xs sm:text-sm text-brand-gold bg-brand-gold/10 hover:bg-brand-gold/20 transition-colors cursor-pointer"
+                                  >
+                                    <MapPin size={13} className="shrink-0" />
+                                    <span className="truncate">
+                                      {dt.useCustomCity} <strong>{details.city.trim()}</strong>
+                                    </span>
+                                  </button>
+                                </li>
+                              )}
+                            {filteredCities.length === 0 && details.city.trim().length < 2 && (
+                              <li className="px-3.5 py-3 text-center text-xs text-gray-500">
+                                {dt.noMatchingResults}
+                              </li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
                       {fieldErrors.city && (
                         <p className="text-xs text-red-400 mt-1">{fieldErrors.city}</p>
                       )}

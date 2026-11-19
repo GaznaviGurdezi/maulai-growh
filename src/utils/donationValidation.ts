@@ -186,6 +186,21 @@ export function validateMobileNumber(
         return { errorCode: 'invalid_mobile_length', digits };
       }
       return { errorCode: null, digits };
+    case '+973':
+      if (!/^[36]\d{7}$/.test(digits)) {
+        return { errorCode: 'invalid_mobile_length', digits };
+      }
+      return { errorCode: null, digits };
+    case '+92':
+      if (!/^3\d{9}$/.test(digits)) {
+        return { errorCode: 'invalid_mobile_length', digits };
+      }
+      return { errorCode: null, digits };
+    case '+880':
+      if (!/^1[3-9]\d{8}$/.test(digits)) {
+        return { errorCode: 'invalid_mobile_length', digits };
+      }
+      return { errorCode: null, digits };
     case '+61':
       if (!/^4\d{8}$/.test(digits)) {
         return { errorCode: 'invalid_mobile_length', digits };
@@ -201,6 +216,28 @@ export function validateMobileNumber(
         return { errorCode: 'invalid_mobile_length', digits };
       }
       return { errorCode: null, digits };
+  }
+}
+
+export function getMobileMaxLength(countryCode: string): number {
+  switch (countryCode) {
+    case '+91':
+    case '+1':
+    case '+92':
+    case '+880':
+      return 10;
+    case '+971':
+    case '+966':
+    case '+61':
+      return 9;
+    case '+974':
+    case '+965':
+    case '+968':
+    case '+973':
+    case '+65':
+      return 8;
+    default:
+      return 15;
   }
 }
 
@@ -227,7 +264,14 @@ export function validatePanNumber(pan: string, required: boolean): FieldErrorCod
 
 export function parseCombinedMobile(combinedMobile: string): { countryCode: string; digits: string } {
   const clean = String(combinedMobile || '').trim();
-  const knownCodes = ['+971', '+966', '+974', '+965', '+968', '+91', '+44', '+61', '+65', '+1'];
+  const knownCodes = [
+    '+998', '+994', '+977', '+974', '+973', '+971', '+968', '+966', '+965', '+964',
+    '+962', '+961', '+960', '+880', '+852', '+353', '+351', '+256', '+255', '+254',
+    '+234', '+230', '+212', '+98', '+94', '+93', '+92', '+91', '+90', '+86', '+82',
+    '+81', '+66', '+65', '+64', '+63', '+62', '+61', '+60', '+55', '+52', '+49',
+    '+48', '+47', '+46', '+45', '+44', '+43', '+41', '+39', '+34', '+33', '+32',
+    '+31', '+27', '+20', '+7', '+1'
+  ];
   for (const code of knownCodes) {
     if (clean.startsWith(code)) {
       return { countryCode: code, digits: clean.slice(code.length) };
