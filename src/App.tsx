@@ -29,14 +29,30 @@ import { useEffect } from 'react';
 import { ContactUs } from './components/ContactUs';
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
+    if (hash) {
+      const targetId = hash.slice(1);
+      const scrollToTarget = () => {
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return true;
+        }
+        return false;
+      };
+      if (!scrollToTarget()) {
+        const timer = setTimeout(scrollToTarget, 120);
+        return () => clearTimeout(timer);
+      }
+      return;
+    }
     window.scrollTo(0, 0);
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return null;
 }

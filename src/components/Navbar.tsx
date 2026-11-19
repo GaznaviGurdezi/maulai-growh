@@ -53,45 +53,51 @@ export function Navbar() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  const isCurrentPath = (path?: string) => {
+    if (path === undefined || path === "#") return false;
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    return location.pathname === normalizedPath;
+  };
+
   const isActive = (path: string) => {
-    return location.pathname === path
+    return isCurrentPath(path)
       ? "text-brand-gold bg-[#d4af37]/10"
       : "text-gray-300 hover:text-brand-gold";
   };
 
   const navLinks = [
-    { name: nt.navHome, href: "/" },
+    { name: nt.navHome, href: "" },
     {
       name: nt.navAbout,
       dropdown: [
-        { name: nt.navAboutSub1, href: "/about" },
-        { name: nt.navAboutSub3, href: "/leadership" },
-        { name: nt.navAboutSub4, href: "/chishty" },
+        { name: nt.navAboutSub1, href: "about" },
+        { name: nt.navAboutSub3, href: "leadership" },
+        { name: nt.navAboutSub4, href: "chishty" },
       ],
     },
     {
       name: nt.navActivities,
       dropdown: [
-        { name: nt.navActDegs, href: "/activities" },
-        { name: nt.navAct1, href: "/langar" },
+        { name: nt.navActDegs, href: "activities" },
+        { name: nt.navAct1, href: "langar" },
       ],
     },
 
     {
       name: nt.navGallery,
-      href: "/gallery",
+      href: "gallery",
     },
     {
       name: nt.navDonations,
-      dropdown: [{ name: nt.navDonSub, href: "/donate" }],
+      dropdown: [{ name: nt.navDonSub, href: "donate" }],
     },
 
-    { name: nt.navContact, href: "/contact" },
+    { name: nt.navContact, href: "contact" },
   ];
 
   // Flat array of links for search
   const allLinks = navLinks.flatMap((link) => [
-    { name: link.name, href: link.href },
+    ...(link.href !== undefined ? [{ name: link.name, href: link.href }] : []),
     ...(link.dropdown || []).map((sub) => ({ name: sub.name, href: sub.href })),
   ]);
 
@@ -129,7 +135,7 @@ export function Navbar() {
             <motion.div layout transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
               <Link
                 reloadDocument
-                to="/"
+                to=""
                 className="flex items-center gap-2 sm:gap-3 lg:gap-4 group shrink-0 relative z-10"
               >
                 <div className={`relative flex-shrink-0 rounded-full border-2 border-brand-gold/60 shadow-[0_0_20px_rgba(212,175,55,0.3)] bg-black flex items-center justify-center overflow-hidden transition-all duration-500 ease-in-out ${isScrolled ? "w-10 h-10 md:w-12 md:h-12" : "w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16"}`}>
@@ -181,7 +187,7 @@ export function Navbar() {
                           onKeyDown={(e) => {
                             if (e.key === "Enter" && searchResults.length > 0) {
                               const href = searchResults[0].href;
-                              if (href && href !== "#") {
+                              if (href !== undefined && href !== "#") {
                                 navigate(href);
                               }
                               setIsSearchFocused(false);
@@ -309,7 +315,7 @@ export function Navbar() {
                 >
                   <Link
                     reloadDocument
-                    to={item.href}
+                    to={item.href ?? "#"}
                     onClick={(e) => {
                       if (item.dropdown && window.innerWidth < 1024) {
                         e.preventDefault();
@@ -318,7 +324,7 @@ export function Navbar() {
                       }
                     }}
                     className={`flex items-center gap-1 font-sans font-semibold text-[10px] md:text-[14px] lg:text-[15px] py-1 tracking-widest uppercase rounded whitespace-nowrap ${
-                      location.pathname === item.href && item.href !== "#"
+                      isCurrentPath(item.href)
                         ? "text-brand-gold"
                         : "text-gray-200 group-hover:text-brand-gold transition-colors duration-300"
                     }`}
@@ -453,7 +459,7 @@ export function Navbar() {
                     <li key={index} className="flex flex-col border-b border-[#d4af37]/10 last:border-0">
                       <div className="flex items-center justify-between py-3.5">
                         <Link
-                          to={item.dropdown ? "#" : item.href}
+                          to={item.dropdown ? "#" : (item.href ?? "")}
                           onClick={(e) => {
                             if (item.dropdown) {
                               e.preventDefault();
@@ -464,7 +470,7 @@ export function Navbar() {
                             }
                           }}
                           className={`font-sans font-semibold text-[14px] md:text-[16px] tracking-widest uppercase flex-1 ${
-                            location.pathname === item.href && item.href !== "#"
+                            isCurrentPath(item.href)
                               ? "text-brand-gold"
                               : "text-gray-200"
                           }`}

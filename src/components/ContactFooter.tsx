@@ -10,7 +10,13 @@ export function ContactFooter() {
   const isHindi = language === 'hi';
   const isUrdu = language === 'ur';
 
-  const quickLinks = [{ name: ft.linkHome, path: '/' }, { name: ft.linkAbout, path: '/about' }, { name: ft.linkMission, path: '/mission' }, { name: ft.linkLeadership, path: '/leadership' }, { name: ft.linkGallery, path: '/gallery' }];
+  const quickLinks = [
+    { name: ft.linkHome, path: '' },
+    { name: ft.linkAbout, path: 'about' },
+    { name: ft.linkMission, path: 'about#mission' },
+    { name: ft.linkLeadership, path: 'leadership' },
+    { name: ft.linkGallery, path: 'gallery' },
+  ];
 
   return (
     <footer id="contact" className="relative z-40 bg-[#000000] border-t border-brand-gold/20 pt-20 pb-0 overflow-hidden">
@@ -89,7 +95,16 @@ export function ContactFooter() {
             <ul className="space-y-3">
               {quickLinks.map((link, idx) => (
                 <li key={idx}>
-                  <Link to={link.path} className="group flex items-center text-gray-300 hover:text-brand-gold transition-all duration-300" onClick={() => window.scrollTo(0,0)}>
+                  <Link
+                    reloadDocument
+                    to={link.path}
+                    className="group flex items-center text-gray-300 hover:text-brand-gold transition-all duration-300"
+                    onClick={() => {
+                      if (!link.path.includes('#')) {
+                        window.scrollTo(0, 0);
+                      }
+                    }}
+                  >
                     <ChevronRight size={16} className="text-brand-gold/50 group-hover:text-brand-gold transition-all duration-300 mr-2 transform group-hover:translate-x-1" />
                     <span className="uppercase text-[13px] md:text-[14px] tracking-widest">{link.name}</span>
                   </Link>
