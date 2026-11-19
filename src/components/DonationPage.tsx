@@ -1258,7 +1258,7 @@ export function DonationPage() {
                               className="w-40 h-40 object-contain"
                             />
                           </div>
-                          <div className={`flex-1 space-y-3 ${isUrdu ? 'text-right' : 'text-center sm:text-left'}`}>
+                          <div className={`flex-1 min-w-0 w-full space-y-3 ${isUrdu ? 'text-right' : 'text-center sm:text-left'}`}>
                             <div>
                               <h4 className="text-white font-bold text-base sm:text-lg">{dt.scanUpiTitle}</h4>
                               <p className="text-gray-400 text-xs sm:text-sm mt-1">{dt.scanUpiDesc}</p>

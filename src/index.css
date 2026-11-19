@@ -10239,7 +10239,9 @@ html[lang="hi"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2
   .payment-modal-body {
     display: flex !important;
     flex-direction: column !important;
-    padding: 2rem !important;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding: 1.75rem 2rem !important;
     overflow-y: auto !important;
     width: 100% !important;
   }
@@ -10255,10 +10257,11 @@ html[lang="hi"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2
     position: relative !important;
     z-index: 20 !important;
     margin-top: 0 !important;
-    margin-bottom: 2rem !important;
+    margin-bottom: 1.5rem !important;
     margin-left: auto !important;
     margin-right: auto !important;
     width: fit-content !important;
+    max-width: 100% !important;
     font-size: 16px !important;
     padding: 0.625rem 1.25rem !important;
     border-radius: 9999px !important;
@@ -10288,7 +10291,7 @@ html[lang="hi"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2
   html[lang="ur"] .payment-modal-badge {
     font-size: 20px !important;
     font-family: Georgia, serif !important;
-    margin-bottom: 2rem !important;
+    margin-bottom: 1.5rem !important;
   }
   html[lang="ur"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(1) svg,
   html[lang="ur"] .payment-modal-badge svg {
@@ -10296,19 +10299,23 @@ html[lang="hi"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2
     height: 20px !important;
   }
 
-  /* Payment Methods Grid: placed underneath 100% badge, exact laptop 2 columns with 1rem (gap-4) */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(2),
+  /* Payment Content Wrapper (Tabs + UPI QR / Bank Transfer / Gateway panels): full-width stack matching laptop */
+  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(2) {
+    order: 2 !important;
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Online Gateway Payment Methods Grid: scoped strictly to .payment-methods-grid */
   div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) .payment-methods-grid,
   .payment-methods-grid {
-    order: 2 !important;
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 1rem !important;
     width: 100% !important;
   }
 
-  /* Payment Method Buttons: exact laptop p-4, rounded-xl, gap-4 */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(2) button,
+  /* Online Gateway Payment Method Buttons: scoped strictly to .payment-method-btn */
   div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) .payment-method-btn,
   .payment-method-btn {
     padding: 1rem !important;
@@ -10321,20 +10328,17 @@ html[lang="hi"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2
   }
 
   /* Icon wrapper: exact laptop p-2 rounded-lg */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(2) button > div:nth-of-type(1),
   div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) .payment-method-icon,
   .payment-method-icon {
     padding: 0.5rem !important;
     border-radius: 0.5rem !important;
   }
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(2) button > div:nth-of-type(1) svg,
   .payment-method-icon svg {
     width: 20px !important;
     height: 20px !important;
   }
 
   /* Method Title (h4): exact laptop 18px (Urdu: 20px) */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(2) button h4,
   div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) .payment-method-title,
   .payment-method-title {
     font-size: 18px !important;
@@ -10342,14 +10346,12 @@ html[lang="hi"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2
     margin-bottom: 0.25rem !important;
     color: #ffffff !important;
   }
-  html[lang="ur"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(2) button h4,
   html[lang="ur"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) .payment-method-title,
   html[lang="ur"] .payment-method-title {
     font-size: 20px !important;
   }
 
   /* Method Subtitle (p): exact laptop 15px (Urdu: 20px) */
-  div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(2) button p,
   div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) .payment-method-sub,
   .payment-method-sub {
     font-size: 15px !important;
@@ -10358,7 +10360,6 @@ html[lang="hi"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2
     padding: 0 !important;
     color: #6b7280 !important;
   }
-  html[lang="ur"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2).payment-modal-card > div:nth-of-type(2) > div:nth-of-type(2) button p,
   html[lang="ur"] div#root:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) .payment-method-sub,
   html[lang="ur"] .payment-method-sub {
     font-size: 20px !important;
