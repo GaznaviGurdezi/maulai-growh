@@ -13,9 +13,11 @@ const FOUNDATION_PAYMENT_CONFIG = {
   whatsapp: "919680872049",
 };
 
+const cleanEnv = (val) => String(val || "").trim().replace(/^['"]|['"]$/g, "");
+
 export const handler = async () => {
-  const keyId = (process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || "").trim();
-  const keySecret = (process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET || "").trim();
+  const keyId = cleanEnv(process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID);
+  const keySecret = cleanEnv(process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET);
   const razorpayEnabled = Boolean(keyId && keySecret);
 
   return {

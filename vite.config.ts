@@ -72,7 +72,9 @@ export default defineConfig(({mode}) => {
     process.env.VITE_RAZORPAY_KEY_ID ||
     process.env.RAZORPAY_KEY_ID ||
     ''
-  ).trim();
+  )
+    .trim()
+    .replace(/^['"]|['"]$/g, '');
 
   return {
     appType: 'spa' as const,

@@ -80,11 +80,13 @@ interface DonationReceipt {
 
 declare const __RAZORPAY_KEY_ID__: string | undefined;
 
-const ENV_RAZORPAY_KEY_ID = (
+const cleanRazorpayKey = (val: string | undefined) =>
+  String(val || '').trim().replace(/^['"]|['"]$/g, '');
+
+const ENV_RAZORPAY_KEY_ID = cleanRazorpayKey(
   ((import.meta as unknown) as { env?: Record<string, string | undefined> }).env?.VITE_RAZORPAY_KEY_ID ||
-  (typeof __RAZORPAY_KEY_ID__ !== 'undefined' ? __RAZORPAY_KEY_ID__ : '') ||
-  ''
-).trim();
+    (typeof __RAZORPAY_KEY_ID__ !== 'undefined' ? __RAZORPAY_KEY_ID__ : '')
+);
 
 const DEFAULT_CONFIG: DonationConfig = {
   razorpayEnabled: false,

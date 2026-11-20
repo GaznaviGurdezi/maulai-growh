@@ -28,8 +28,9 @@ export const handler = async (event) => {
   }
 
   try {
-    const keyId = (process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || "").trim();
-    const keySecret = (process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET || "").trim();
+    const cleanEnv = (val) => String(val || "").trim().replace(/^['"]|['"]$/g, "");
+    const keyId = cleanEnv(process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID);
+    const keySecret = cleanEnv(process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET);
 
     if (!keyId || !keySecret) {
       return {
