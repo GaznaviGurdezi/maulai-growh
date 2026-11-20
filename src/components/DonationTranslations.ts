@@ -142,6 +142,9 @@ export const donationTranslations = {
     bankUtrPlaceholder: "Enter IMPS / NEFT / RTGS reference",
     whatsappProofBtn: "Send Screenshot on WhatsApp",
     gatewayCardsNote: "Instant Online Gateway (Visa, Mastercard, RuPay, NetBanking)",
+    gatewayUnavailableNotice: "Card & NetBanking online checkout is currently being activated. Please complete your donation instantly via UPI QR or Direct Bank Transfer.",
+    switchToUpiBtn: "Pay via UPI QR",
+    switchToBankBtn: "Use Bank Transfer",
 
     // Receipt & Verification
     receiptNoLabel: "Receipt No.",
@@ -311,6 +314,9 @@ export const donationTranslations = {
     bankUtrPlaceholder: "IMPS / NEFT ریفرنس نمبر درج کریں",
     whatsappProofBtn: "واٹس ایپ پر اسکرین شاٹ بھیجیں",
     gatewayCardsNote: "آن لائن کارڈ اور نیٹ بینکنگ ادائیگی",
+    gatewayUnavailableNotice: "کارڈ اور نیٹ بینکنگ آن لائن گیٹ وے فی الحال فعال کیا جا رہا ہے۔ براہِ کرم اپنا عطیہ فوری طور پر UPI QR یا بینک ٹرانسفر کے ذریعے مکمل فرمائیں۔",
+    switchToUpiBtn: "UPI QR سے ادائیگی کریں",
+    switchToBankBtn: "بینک ٹرانسفر استعمال کریں",
 
     // Receipt & Verification
     receiptNoLabel: "رسید نمبر",
@@ -480,6 +486,9 @@ export const donationTranslations = {
     bankUtrPlaceholder: "IMPS / NEFT रेफरेंस नंबर दर्ज करें",
     whatsappProofBtn: "व्हाट्सएप पर स्क्रीनशॉट भेजें",
     gatewayCardsNote: "ऑनलाइन कार्ड और नेट बैंकिंग भुगतान",
+    gatewayUnavailableNotice: "कार्ड और नेट बैंकिंग ऑनलाइन गेटवे अभी सक्रिय किया जा रहा है। कृपया अपना दान तुरंत UPI QR या सीधे बैंक ट्रांसफर के माध्यम से पूरा करें।",
+    switchToUpiBtn: "UPI QR से भुगतान करें",
+    switchToBankBtn: "बैंक ट्रांसफर चुनें",
 
     // Receipt & Verification
     receiptNoLabel: "रसीद संख्या",

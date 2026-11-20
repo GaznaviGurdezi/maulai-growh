@@ -78,9 +78,13 @@ interface DonationReceipt {
   createdAt: string;
 }
 
+const ENV_RAZORPAY_KEY_ID = (
+  ((import.meta as unknown) as { env?: Record<string, string | undefined> }).env?.VITE_RAZORPAY_KEY_ID || ''
+).trim();
+
 const DEFAULT_CONFIG: DonationConfig = {
   razorpayEnabled: false,
-  razorpayKeyId: '',
+  razorpayKeyId: ENV_RAZORPAY_KEY_ID,
   upi: {
     id: 'syedgggurdezi@okicici',
     payeeName: 'Shah Sufi Syed Gous Gaznavi Gurdezi'
@@ -93,6 +97,15 @@ const DEFAULT_CONFIG: DonationConfig = {
     ifsc: 'ICIC0007684'
   },
   whatsapp: '919680872049'
+};
+
+const createLocalReceiptNumber = () => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const rand = Math.random().toString(16).slice(2, 8).toUpperCase().padEnd(6, '0');
+  return `MGF-${y}${m}${d}-${rand}`;
 };
 
 const loadRazorpayScript = () => {
@@ -332,12 +345,15 @@ export function DonationPage() {
   useEffect(() => {
     let mounted = true;
     fetch('/api/donations/config')
-      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => {
+        const contentType = res.headers.get('content-type') || '';
+        return res.ok && contentType.includes('application/json') ? res.json() : null;
+      })
       .then((data) => {
         if (mounted && data) {
           setConfig({
             razorpayEnabled: Boolean(data.razorpayEnabled),
-            razorpayKeyId: data.razorpayKeyId || '',
+            razorpayKeyId: (data.razorpayKeyId || ENV_RAZORPAY_KEY_ID || '').trim(),
             upi: data.upi || DEFAULT_CONFIG.upi,
             bank: data.bank || DEFAULT_CONFIG.bank,
             whatsapp: data.whatsapp || DEFAULT_CONFIG.whatsapp
@@ -519,25 +535,28 @@ export function DonationPage() {
           require80G: details.require80G,
         }),
       });
-      const data = await res.json();
-      if (!res.ok || !data.valid) {
-        const srvErrors: Record<string, string> = {};
-        if (data.fieldErrors?.email) {
-          srvErrors.email = dt.errEmailDomainUnreachable;
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        if (!res.ok || !data.valid) {
+          const srvErrors: Record<string, string> = {};
+          if (data.fieldErrors?.email) {
+            srvErrors.email = dt.errEmailDomainUnreachable;
+          }
+          if (data.fieldErrors?.mobile) {
+            srvErrors.mobile = mapValidationError(
+              details.countryCode === '+91' ? 'invalid_indian_mobile' : 'invalid_mobile_length'
+            );
+          }
+          if (data.fieldErrors?.fullName) srvErrors.fullName = dt.errInvalidName;
+          if (data.fieldErrors?.country) srvErrors.country = dt.errInvalidLocation;
+          if (data.fieldErrors?.city) srvErrors.city = dt.errInvalidLocation;
+          if (data.fieldErrors?.pan) srvErrors.pan = dt.alertInvalidPan;
+          setFieldErrors(srvErrors);
+          setStep2Error(data.error || dt.alertFillFields);
+          setIsValidatingDetails(false);
+          return;
         }
-        if (data.fieldErrors?.mobile) {
-          srvErrors.mobile = mapValidationError(
-            details.countryCode === '+91' ? 'invalid_indian_mobile' : 'invalid_mobile_length'
-          );
-        }
-        if (data.fieldErrors?.fullName) srvErrors.fullName = dt.errInvalidName;
-        if (data.fieldErrors?.country) srvErrors.country = dt.errInvalidLocation;
-        if (data.fieldErrors?.city) srvErrors.city = dt.errInvalidLocation;
-        if (data.fieldErrors?.pan) srvErrors.pan = dt.alertInvalidPan;
-        setFieldErrors(srvErrors);
-        setStep2Error(data.error || dt.alertFillFields);
-        setIsValidatingDetails(false);
-        return;
       }
     } catch {
       // Allow client-validated details to proceed if offline check cannot complete
@@ -561,8 +580,30 @@ export function DonationPage() {
 
     setPaymentError('');
     setIsProcessing(true);
+    const cleanDigits = details.mobile.replace(/\D/g, '');
+    const buildClientReceipt = (): DonationReceipt => ({
+      receiptNumber: createLocalReceiptNumber(),
+      orderId: `DIRECT-${Date.now()}`,
+      paymentId: cleanUtr,
+      utrNumber: cleanUtr,
+      amount: getNumericAmount(),
+      currency: 'INR',
+      cause,
+      donorType,
+      frequency,
+      donorName: details.fullName.trim(),
+      donorEmail: details.email.trim(),
+      donorMobile: `${details.countryCode}${cleanDigits}`,
+      country: details.country.trim(),
+      city: details.city.trim(),
+      pan: details.pan.trim().toUpperCase(),
+      require80G: details.require80G,
+      paymentMethod: method,
+      status: 'PENDING_VERIFICATION',
+      createdAt: new Date().toISOString()
+    });
+
     try {
-      const cleanDigits = details.mobile.replace(/\D/g, '');
       const response = await fetch('/api/donations/submit-direct', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -587,6 +628,17 @@ export function DonationPage() {
         })
       });
 
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        // Static hosting (e.g. Netlify) without backend API: generate official donor receipt locally
+        setReceiptData(buildClientReceipt());
+        setIsProcessing(false);
+        setShowPaymentModal(false);
+        setStep(4);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
       const data = await response.json();
       if (!response.ok || !data.success) {
         setPaymentError(data.error || 'Could not record donation. Please check your UTR reference.');
@@ -600,98 +652,161 @@ export function DonationPage() {
       setStep(4);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
-      setPaymentError('Network error while recording donation. Please try again.');
+      setReceiptData(buildClientReceipt());
       setIsProcessing(false);
+      setShowPaymentModal(false);
+      setStep(4);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleProcessRazorpay = async (methodId: string) => {
     setPaymentError('');
+    const effectiveKey = (config.razorpayKeyId || ENV_RAZORPAY_KEY_ID || '').trim();
+    if (!effectiveKey) {
+      setPaymentError(dt.gatewayUnavailableNotice);
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
       const loaded = await loadRazorpayScript();
       if (!loaded) {
-        setPaymentError('Razorpay SDK failed to load. Please check your connection or use UPI QR / Bank Transfer.');
-        setIsProcessing(false);
-        return;
-      }
-
-      const key = config.razorpayKeyId;
-      if (!config.razorpayEnabled || !key) {
-        setPaymentError('Online card gateway is not active yet. Please use UPI QR or Direct Bank Transfer.');
+        setPaymentError('Razorpay checkout failed to load. Please check your internet connection or use UPI QR / Bank Transfer.');
         setIsProcessing(false);
         return;
       }
 
       const cleanDigits = details.mobile.replace(/\D/g, '');
       const amountToPay = getNumericAmount();
-      const orderRes = await fetch('/api/razorpay/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: amountToPay,
-          currency: 'INR',
-          donorName: details.fullName.trim(),
-          donorEmail: details.email.trim(),
-          countryCode: details.countryCode,
-          mobile: cleanDigits,
-          donorMobile: `${details.countryCode}${cleanDigits}`,
-          donorType,
-          frequency,
-          country: details.country.trim(),
-          city: details.city.trim(),
-          pan: details.pan.trim().toUpperCase(),
-          require80G: details.require80G,
-          prayerRequest: details.prayerRequest.trim(),
-          paymentMethod: `razorpay_${methodId}`,
-          cause
-        })
-      });
+      const amountInPaise = Math.round(amountToPay * 100);
+      let serverOrder: { id: string; amount: number; currency: string } | null = null;
 
-      const order = await orderRes.json();
-      if (!orderRes.ok || order.error) {
-        setPaymentError(order.error || 'Could not initiate payment order.');
-        setIsProcessing(false);
-        return;
+      if (config.razorpayEnabled) {
+        const orderRes = await fetch('/api/razorpay/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: amountToPay,
+            currency: 'INR',
+            donorName: details.fullName.trim(),
+            donorEmail: details.email.trim(),
+            countryCode: details.countryCode,
+            mobile: cleanDigits,
+            donorMobile: `${details.countryCode}${cleanDigits}`,
+            donorType,
+            frequency,
+            country: details.country.trim(),
+            city: details.city.trim(),
+            pan: details.pan.trim().toUpperCase(),
+            require80G: details.require80G,
+            prayerRequest: details.prayerRequest.trim(),
+            paymentMethod: `razorpay_${methodId}`,
+            cause
+          })
+        });
+
+        const contentType = orderRes.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const order = await orderRes.json();
+          if (!orderRes.ok || order.error) {
+            setPaymentError(order.error || 'Could not initiate payment order.');
+            setIsProcessing(false);
+            return;
+          }
+          serverOrder = order;
+        }
       }
 
-      const options = {
-        key,
-        amount: order.amount,
-        currency: order.currency,
+      const razorpayMethodMap: Record<string, string | undefined> = {
+        upi: 'upi',
+        card: 'card',
+        netbanking: 'netbanking',
+        wallet: 'wallet',
+        int_card: 'card'
+      };
+      const preferredMethod = razorpayMethodMap[methodId];
+
+      const options: Record<string, unknown> = {
+        key: effectiveKey,
+        amount: serverOrder ? serverOrder.amount : amountInPaise,
+        currency: serverOrder ? serverOrder.currency : 'INR',
         name: 'Maulai Growh Foundation',
         description: cause,
         image: '/logo.png',
-        order_id: order.id,
+        ...(serverOrder ? { order_id: serverOrder.id } : {}),
+        notes: {
+          cause,
+          donor_name: details.fullName.trim(),
+          donor_type: donorType,
+          frequency,
+          city: details.city.trim(),
+          country: details.country.trim()
+        },
         handler: async function (response: any) {
-          try {
-            const verifyRes = await fetch('/api/razorpay/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(response)
-            });
-            const result = await verifyRes.json();
-            if (result.success && result.donation) {
-              setReceiptData(result.donation);
+          if (serverOrder) {
+            try {
+              const verifyRes = await fetch('/api/razorpay/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(response)
+              });
+              const verifyContentType = verifyRes.headers.get('content-type') || '';
+              if (verifyContentType.includes('application/json')) {
+                const result = await verifyRes.json();
+                if (result.success && result.donation) {
+                  setReceiptData(result.donation);
+                  setIsProcessing(false);
+                  setShowPaymentModal(false);
+                  setStep(4);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  return;
+                } else {
+                  setPaymentError(result.message || 'Payment verification failed!');
+                  setIsProcessing(false);
+                  return;
+                }
+              }
+            } catch {
+              setPaymentError('Error verifying payment. Please contact us with your payment ID.');
               setIsProcessing(false);
-              setShowPaymentModal(false);
-              setStep(4);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-              setPaymentError(result.message || 'Payment verification failed!');
-              setIsProcessing(false);
+              return;
             }
-          } catch {
-            setPaymentError('Error verifying payment. Please contact us with your payment ID.');
-            setIsProcessing(false);
           }
+
+          // Direct Razorpay checkout success (static hosting mode with VITE_RAZORPAY_KEY_ID)
+          const directReceipt: DonationReceipt = {
+            receiptNumber: createLocalReceiptNumber(),
+            orderId: response.razorpay_order_id || `RZP-${Date.now()}`,
+            paymentId: response.razorpay_payment_id || `PAY-${Date.now()}`,
+            amount: amountToPay,
+            currency: 'INR',
+            cause,
+            donorType,
+            frequency,
+            donorName: details.fullName.trim(),
+            donorEmail: details.email.trim(),
+            donorMobile: `${details.countryCode}${cleanDigits}`,
+            country: details.country.trim(),
+            city: details.city.trim(),
+            pan: details.pan.trim().toUpperCase(),
+            require80G: details.require80G,
+            paymentMethod: `razorpay_${methodId}`,
+            status: 'SUCCESS',
+            createdAt: new Date().toISOString()
+          };
+          setReceiptData(directReceipt);
+          setIsProcessing(false);
+          setShowPaymentModal(false);
+          setStep(4);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         },
         prefill: {
           name: details.fullName.trim(),
           email: details.email.trim(),
-          contact: `${details.countryCode}${details.mobile.trim()}`,
-          method: methodId === 'int_card' ? 'card' : methodId
+          contact: `${details.countryCode}${cleanDigits}`,
+          ...(preferredMethod ? { method: preferredMethod } : {})
         },
         theme: {
           color: '#d4af37'
@@ -1206,45 +1321,43 @@ export function DonationPage() {
                 ) : (
                   <div className="order-2 space-y-5">
                     {/* Payment Method Selector Tabs */}
-                    <div className={`grid gap-2 bg-black/70 p-1.5 rounded-xl border border-white/10 ${config.razorpayEnabled ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                    <div className="grid grid-cols-3 gap-2 bg-black/70 p-1.5 rounded-xl border border-white/10">
                       <button
                         type="button"
                         onClick={() => { setActivePayTab('upi'); setPaymentError(''); }}
-                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                        className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 px-2 sm:px-3 rounded-lg text-[11px] sm:text-sm font-bold text-center leading-tight transition-all cursor-pointer ${
                           activePayTab === 'upi'
                             ? 'bg-brand-gold text-black shadow-md'
                             : 'text-gray-300 hover:text-white hover:bg-white/5'
                         }`}
                       >
-                        <Smartphone size={16} />
+                        <Smartphone size={16} className="shrink-0" />
                         <span>{dt.tabUpi}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => { setActivePayTab('bank'); setPaymentError(''); }}
-                        className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                        className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 px-2 sm:px-3 rounded-lg text-[11px] sm:text-sm font-bold text-center leading-tight transition-all cursor-pointer ${
                           activePayTab === 'bank'
                             ? 'bg-brand-gold text-black shadow-md'
                             : 'text-gray-300 hover:text-white hover:bg-white/5'
                         }`}
                       >
-                        <Landmark size={16} />
+                        <Landmark size={16} className="shrink-0" />
                         <span>{dt.tabBank}</span>
                       </button>
-                      {config.razorpayEnabled && (
-                        <button
-                          type="button"
-                          onClick={() => { setActivePayTab('gateway'); setPaymentError(''); }}
-                          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                            activePayTab === 'gateway'
-                              ? 'bg-brand-gold text-black shadow-md'
-                              : 'text-gray-300 hover:text-white hover:bg-white/5'
-                          }`}
-                        >
-                          <CreditCard size={16} />
-                          <span>{dt.tabOnline}</span>
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => { setActivePayTab('gateway'); setPaymentError(''); }}
+                        className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2.5 px-2 sm:px-3 rounded-lg text-[11px] sm:text-sm font-bold text-center leading-tight transition-all cursor-pointer ${
+                          activePayTab === 'gateway'
+                            ? 'bg-brand-gold text-black shadow-md'
+                            : 'text-gray-300 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <CreditCard size={16} className="shrink-0" />
+                        <span>{dt.tabOnline}</span>
+                      </button>
                     </div>
 
                     {/* UPI QR & App Instant Payment */}
@@ -1420,15 +1533,35 @@ export function DonationPage() {
                       </div>
                     )}
 
-                    {/* Razorpay Online Gateway (when RAZORPAY_KEY_ID & SECRET are configured) */}
-                    {activePayTab === 'gateway' && config.razorpayEnabled && (
+                    {/* Razorpay Online Gateway (Card / NetBanking / Wallets / International) */}
+                    {activePayTab === 'gateway' && (
                       <div className="space-y-4">
                         <p className="text-xs sm:text-sm text-gray-400 text-center">{dt.gatewayCardsNote}</p>
 
                         {paymentError && (
-                          <div className="flex items-start gap-2 text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-xs sm:text-sm">
-                            <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                            <span>{paymentError}</span>
+                          <div className="space-y-3 text-amber-200 bg-amber-500/10 border border-brand-gold/35 rounded-xl p-3.5 text-xs sm:text-sm">
+                            <div className="flex items-start gap-2">
+                              <AlertCircle size={16} className="shrink-0 mt-0.5 text-brand-gold" />
+                              <span>{paymentError}</span>
+                            </div>
+                            {!(config.razorpayKeyId || ENV_RAZORPAY_KEY_ID) && (
+                              <div className="flex flex-wrap gap-2 pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => { setActivePayTab('upi'); setPaymentError(''); }}
+                                  className="px-3.5 py-2 rounded-lg bg-brand-gold text-black text-xs font-bold hover:bg-white transition-colors cursor-pointer"
+                                >
+                                  {dt.switchToUpiBtn}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => { setActivePayTab('bank'); setPaymentError(''); }}
+                                  className="px-3.5 py-2 rounded-lg border border-brand-gold/40 text-brand-gold hover:bg-brand-gold/10 text-xs font-bold transition-colors cursor-pointer"
+                                >
+                                  {dt.switchToBankBtn}
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
 

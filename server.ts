@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import http from "http";
 import path from "path";
@@ -335,10 +336,11 @@ async function startServer() {
   });
 
   app.get("/api/donations/config", (req, res) => {
+    const keyId = (process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || "").trim();
     const razorpayEnabled = Boolean(process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
     res.json({
       razorpayEnabled,
-      razorpayKeyId: razorpayEnabled ? process.env.RAZORPAY_KEY_ID : "",
+      razorpayKeyId: keyId,
       ...FOUNDATION_PAYMENT_CONFIG
     });
   });
