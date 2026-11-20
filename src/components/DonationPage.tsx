@@ -78,8 +78,12 @@ interface DonationReceipt {
   createdAt: string;
 }
 
+declare const __RAZORPAY_KEY_ID__: string | undefined;
+
 const ENV_RAZORPAY_KEY_ID = (
-  ((import.meta as unknown) as { env?: Record<string, string | undefined> }).env?.VITE_RAZORPAY_KEY_ID || ''
+  ((import.meta as unknown) as { env?: Record<string, string | undefined> }).env?.VITE_RAZORPAY_KEY_ID ||
+  (typeof __RAZORPAY_KEY_ID__ !== 'undefined' ? __RAZORPAY_KEY_ID__ : '') ||
+  ''
 ).trim();
 
 const DEFAULT_CONFIG: DonationConfig = {
@@ -109,15 +113,23 @@ const createLocalReceiptNumber = () => {
 };
 
 const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    if ((window as any).Razorpay) {
+  return new Promise<boolean>((resolve) => {
+    if (typeof (window as any).Razorpay === 'function') {
       resolve(true);
       return;
     }
+    const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+    if (existing) {
+      existing.remove();
+    }
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
+    script.async = true;
+    script.onload = () => resolve(typeof (window as any).Razorpay === 'function');
+    script.onerror = () => {
+      script.remove();
+      resolve(false);
+    };
     document.body.appendChild(script);
   });
 };
@@ -679,11 +691,14 @@ export function DonationPage() {
       }
 
       const cleanDigits = details.mobile.replace(/\D/g, '');
+      const cleanDialDigits = details.countryCode.replace(/\D/g, '');
+      const formattedContact = cleanDialDigits ? `+${cleanDialDigits}${cleanDigits}` : cleanDigits;
       const amountToPay = getNumericAmount();
       const amountInPaise = Math.round(amountToPay * 100);
-      let serverOrder: { id: string; amount: number; currency: string } | null = null;
+      let serverOrder: { id: string; amount: number; currency: string; receiptNumber?: string } | null = null;
 
-      if (config.razorpayEnabled) {
+      // Always try server-side Orders API (works on both Express server and Netlify Functions)
+      try {
         const orderRes = await fetch('/api/razorpay/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -694,7 +709,7 @@ export function DonationPage() {
             donorEmail: details.email.trim(),
             countryCode: details.countryCode,
             mobile: cleanDigits,
-            donorMobile: `${details.countryCode}${cleanDigits}`,
+            donorMobile: formattedContact,
             donorType,
             frequency,
             country: details.country.trim(),
@@ -715,18 +730,23 @@ export function DonationPage() {
             setIsProcessing(false);
             return;
           }
-          serverOrder = order;
+          if (order?.id) {
+            serverOrder = order;
+          }
+        }
+      } catch {
+        if (config.razorpayEnabled) {
+          setPaymentError('Unable to reach payment server. Please check your connection or use UPI QR / Bank Transfer.');
+          setIsProcessing(false);
+          return;
         }
       }
 
-      const razorpayMethodMap: Record<string, string | undefined> = {
-        upi: 'upi',
-        card: 'card',
-        netbanking: 'netbanking',
-        wallet: 'wallet',
-        int_card: 'card'
-      };
-      const preferredMethod = razorpayMethodMap[methodId];
+      // Razorpay Checkout iframe requires an absolute HTTPS URL for the logo
+      const logoUrl =
+        window.location.protocol === 'https:'
+          ? `${window.location.origin}/logo.png`
+          : undefined;
 
       const options: Record<string, unknown> = {
         key: effectiveKey,
@@ -734,7 +754,7 @@ export function DonationPage() {
         currency: serverOrder ? serverOrder.currency : 'INR',
         name: 'Maulai Growh Foundation',
         description: cause,
-        image: '/logo.png',
+        ...(logoUrl ? { image: logoUrl } : {}),
         ...(serverOrder ? { order_id: serverOrder.id } : {}),
         notes: {
           cause,
@@ -745,12 +765,32 @@ export function DonationPage() {
           country: details.country.trim()
         },
         handler: async function (response: any) {
+          const donationMeta = {
+            receiptNumber: serverOrder?.receiptNumber || createLocalReceiptNumber(),
+            amount: amountToPay,
+            currency: 'INR',
+            cause,
+            donorType,
+            frequency,
+            donorName: details.fullName.trim(),
+            donorEmail: details.email.trim(),
+            donorMobile: formattedContact,
+            country: details.country.trim(),
+            city: details.city.trim(),
+            pan: details.pan.trim().toUpperCase(),
+            require80G: details.require80G,
+            paymentMethod: `razorpay_${methodId}`
+          };
+
           if (serverOrder) {
             try {
               const verifyRes = await fetch('/api/razorpay/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(response)
+                body: JSON.stringify({
+                  ...response,
+                  donationDetails: donationMeta
+                })
               });
               const verifyContentType = verifyRes.headers.get('content-type') || '';
               if (verifyContentType.includes('application/json')) {
@@ -775,9 +815,8 @@ export function DonationPage() {
             }
           }
 
-          // Direct Razorpay checkout success (static hosting mode with VITE_RAZORPAY_KEY_ID)
           const directReceipt: DonationReceipt = {
-            receiptNumber: createLocalReceiptNumber(),
+            receiptNumber: donationMeta.receiptNumber,
             orderId: response.razorpay_order_id || `RZP-${Date.now()}`,
             paymentId: response.razorpay_payment_id || `PAY-${Date.now()}`,
             amount: amountToPay,
@@ -787,7 +826,7 @@ export function DonationPage() {
             frequency,
             donorName: details.fullName.trim(),
             donorEmail: details.email.trim(),
-            donorMobile: `${details.countryCode}${cleanDigits}`,
+            donorMobile: formattedContact,
             country: details.country.trim(),
             city: details.city.trim(),
             pan: details.pan.trim().toUpperCase(),
@@ -805,8 +844,7 @@ export function DonationPage() {
         prefill: {
           name: details.fullName.trim(),
           email: details.email.trim(),
-          contact: `${details.countryCode}${cleanDigits}`,
-          ...(preferredMethod ? { method: preferredMethod } : {})
+          contact: formattedContact
         },
         theme: {
           color: '#d4af37'
@@ -818,14 +856,20 @@ export function DonationPage() {
         }
       };
 
-      const rzp = new (window as any).Razorpay(options);
+      const RazorpayCtor = (window as any).Razorpay;
+      const rzp = new RazorpayCtor(options);
       rzp.on('payment.failed', function (response: any) {
-        setPaymentError(`Payment Failed: ${response.error?.description || 'Transaction declined'}`);
+        setPaymentError(
+          `Payment Failed: ${response?.error?.description || response?.error?.reason || 'Transaction declined'}`
+        );
         setIsProcessing(false);
       });
       rzp.open();
-    } catch {
-      setPaymentError('Something went wrong starting online checkout. Please try UPI QR or Bank Transfer.');
+    } catch (err: any) {
+      setPaymentError(
+        err?.message ||
+          'Something went wrong starting online checkout. Please try UPI QR or Bank Transfer.'
+      );
       setIsProcessing(false);
     }
   };

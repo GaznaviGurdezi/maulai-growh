@@ -565,13 +565,15 @@ async function startServer() {
         return res.status(400).json({ error: validation.error, fieldErrors: validation.fieldErrors });
       }
 
-      if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      const keyId = (process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || "").trim();
+      const keySecret = (process.env.RAZORPAY_KEY_SECRET || "").trim();
+      if (!keyId || !keySecret) {
         return res.status(503).json({ error: "Online card/netbanking gateway is not configured. Please use UPI QR or Direct Bank Transfer." });
       }
 
       const razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET,
+        key_id: keyId,
+        key_secret: keySecret,
       });
 
       const receiptNumber = generateReceiptNumber();
@@ -610,9 +612,14 @@ async function startServer() {
       }
 
       res.json({ ...order, receiptNumber });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Razorpay order creation error:", error);
-      res.status(500).json({ error: "Failed to create order" });
+      const rzpMessage =
+        error?.error?.description ||
+        error?.error?.reason ||
+        (typeof error?.message === "string" ? error.message : "") ||
+        "Failed to create payment order.";
+      res.status(500).json({ error: rzpMessage });
     }
   });
 
@@ -620,7 +627,8 @@ async function startServer() {
     try {
       const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body || {};
 
-      if (!process.env.RAZORPAY_KEY_SECRET) {
+      const keySecret = (process.env.RAZORPAY_KEY_SECRET || "").trim();
+      if (!keySecret) {
         return res.status(500).json({ error: "Razorpay secret not configured" });
       }
       if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -629,7 +637,7 @@ async function startServer() {
 
       const sign = `${razorpay_order_id}|${razorpay_payment_id}`;
       const expectedSign = crypto
-        .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+        .createHmac("sha256", keySecret)
         .update(sign)
         .digest("hex");
 
@@ -665,7 +673,7 @@ async function startServer() {
   });
 
   app.get("/api/razorpay/key", (req, res) => {
-    res.json({ key: process.env.RAZORPAY_KEY_ID || "" });
+    res.json({ key: (process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || "").trim() });
   });
 
   const httpServer = http.createServer(app);

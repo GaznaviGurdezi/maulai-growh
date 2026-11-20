@@ -1,0 +1,30 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/donations/config"
+  to = "/.netlify/functions/donations-config"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/razorpay/create-order"
+  to = "/.netlify/functions/razorpay-create-order"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/razorpay/verify"
+  to = "/.netlify/functions/razorpay-verify"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
