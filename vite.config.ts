@@ -1,7 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig, loadEnv, type Plugin} from 'vite';
+import {defineConfig, type Plugin} from 'vite';
 
 function spaFallbackPlugin(): Plugin {
   const rewriteSpaRequest = (
@@ -48,14 +48,14 @@ function spaFallbackPlugin(): Plugin {
       server.middlewares.use(rewriteSpaRequest);
     },
     generateBundle() {
-      // Emit Netlify Function API routes first, then SPA fallback into dist/_redirects
+      // Emit Netlify Function API routes first (forced), then SPA fallback into dist/_redirects
       this.emitFile({
         type: 'asset',
         fileName: '_redirects',
         source: [
-          '/api/donations/config /.netlify/functions/donations-config 200',
-          '/api/razorpay/create-order /.netlify/functions/razorpay-create-order 200',
-          '/api/razorpay/verify /.netlify/functions/razorpay-verify 200',
+          '/api/donations/config /.netlify/functions/donations-config 200!',
+          '/api/razorpay/create-order /.netlify/functions/razorpay-create-order 200!',
+          '/api/razorpay/verify /.netlify/functions/razorpay-verify 200!',
           '/* /index.html 200',
           '',
         ].join('\n'),
@@ -64,24 +64,10 @@ function spaFallbackPlugin(): Plugin {
   };
 }
 
-export default defineConfig(({mode}) => {
-  const env = loadEnv(mode, process.cwd(), '');
-  const publicRazorpayKeyId = (
-    env.VITE_RAZORPAY_KEY_ID ||
-    env.RAZORPAY_KEY_ID ||
-    process.env.VITE_RAZORPAY_KEY_ID ||
-    process.env.RAZORPAY_KEY_ID ||
-    ''
-  )
-    .trim()
-    .replace(/^['"]|['"]$/g, '');
-
+export default defineConfig(() => {
   return {
     appType: 'spa' as const,
     plugins: [react(), tailwindcss(), spaFallbackPlugin()],
-    define: {
-      __RAZORPAY_KEY_ID__: JSON.stringify(publicRazorpayKeyId),
-    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

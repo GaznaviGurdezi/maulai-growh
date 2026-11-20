@@ -28,7 +28,12 @@ export const handler = async (event) => {
   }
 
   try {
-    const keySecret = String(process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET || "")
+    const keySecret = String(
+      process.env.RAZORPAY_KEY_SECRET ||
+        process.env.RAZORPAY_SECRET ||
+        process.env.RAZORPAY_SECRET_KEY ||
+        ""
+    )
       .trim()
       .replace(/^['"]|['"]$/g, "");
     if (!keySecret) {

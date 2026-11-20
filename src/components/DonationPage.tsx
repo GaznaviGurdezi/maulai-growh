@@ -78,15 +78,26 @@ interface DonationReceipt {
   createdAt: string;
 }
 
-declare const __RAZORPAY_KEY_ID__: string | undefined;
-
 const cleanRazorpayKey = (val: string | undefined) =>
   String(val || '').trim().replace(/^['"]|['"]$/g, '');
 
-const ENV_RAZORPAY_KEY_ID = cleanRazorpayKey(
-  ((import.meta as unknown) as { env?: Record<string, string | undefined> }).env?.VITE_RAZORPAY_KEY_ID ||
-    (typeof __RAZORPAY_KEY_ID__ !== 'undefined' ? __RAZORPAY_KEY_ID__ : '')
-);
+const ENV_RAZORPAY_KEY_ID = cleanRazorpayKey(import.meta.env.VITE_RAZORPAY_KEY_ID);
+
+async function fetchJsonWithFallback(urls: string[], init?: RequestInit) {
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, init);
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        return { res, data };
+      }
+    } catch {
+      // Try next endpoint
+    }
+  }
+  return null;
+}
 
 const DEFAULT_CONFIG: DonationConfig = {
   razorpayEnabled: false,
@@ -358,16 +369,13 @@ export function DonationPage() {
 
   useEffect(() => {
     let mounted = true;
-    fetch('/api/donations/config')
-      .then((res) => {
-        const contentType = res.headers.get('content-type') || '';
-        return res.ok && contentType.includes('application/json') ? res.json() : null;
-      })
-      .then((data) => {
-        if (mounted && data) {
+    fetchJsonWithFallback(['/api/donations/config', '/.netlify/functions/donations-config'])
+      .then((result) => {
+        if (mounted && result?.res.ok && result.data) {
+          const data = result.data;
           setConfig({
             razorpayEnabled: Boolean(data.razorpayEnabled),
-            razorpayKeyId: (data.razorpayKeyId || ENV_RAZORPAY_KEY_ID || '').trim(),
+            razorpayKeyId: cleanRazorpayKey(data.razorpayKeyId || ENV_RAZORPAY_KEY_ID),
             upi: data.upi || DEFAULT_CONFIG.upi,
             bank: data.bank || DEFAULT_CONFIG.bank,
             whatsapp: data.whatsapp || DEFAULT_CONFIG.whatsapp
@@ -676,15 +684,40 @@ export function DonationPage() {
 
   const handleProcessRazorpay = async (methodId: string) => {
     setPaymentError('');
-    const effectiveKey = (config.razorpayKeyId || ENV_RAZORPAY_KEY_ID || '').trim();
-    if (!effectiveKey) {
-      setPaymentError(dt.gatewayUnavailableNotice);
-      return;
-    }
-
     setIsProcessing(true);
 
     try {
+      let effectiveKey = cleanRazorpayKey(config.razorpayKeyId || ENV_RAZORPAY_KEY_ID);
+      let serverOrdersEnabled = config.razorpayEnabled;
+
+      // Refresh live server/Netlify Function config if key or server-order flag isn't ready yet
+      if (!effectiveKey || !serverOrdersEnabled) {
+        const liveConfig = await fetchJsonWithFallback([
+          '/api/donations/config',
+          '/.netlify/functions/donations-config'
+        ]);
+        if (liveConfig?.res.ok && liveConfig.data) {
+          const refreshedKey = cleanRazorpayKey(liveConfig.data.razorpayKeyId || effectiveKey);
+          const refreshedEnabled = Boolean(liveConfig.data.razorpayEnabled);
+          effectiveKey = refreshedKey;
+          serverOrdersEnabled = refreshedEnabled;
+          setConfig((prev) => ({
+            ...prev,
+            razorpayEnabled: refreshedEnabled,
+            razorpayKeyId: refreshedKey,
+            upi: liveConfig.data.upi || prev.upi,
+            bank: liveConfig.data.bank || prev.bank,
+            whatsapp: liveConfig.data.whatsapp || prev.whatsapp
+          }));
+        }
+      }
+
+      if (!effectiveKey) {
+        setPaymentError(dt.gatewayUnavailableNotice);
+        setIsProcessing(false);
+        return;
+      }
+
       const loaded = await loadRazorpayScript();
       if (!loaded) {
         setPaymentError('Razorpay checkout failed to load. Please check your internet connection or use UPI QR / Bank Transfer.');
@@ -699,11 +732,11 @@ export function DonationPage() {
       const amountInPaise = Math.round(amountToPay * 100);
       let serverOrder: { id: string; amount: number; currency: string; receiptNumber?: string } | null = null;
 
-      // Use server-side Orders API when both Key ID & Secret are configured on the server/Netlify Functions.
-      // If only the public Key ID is configured (e.g. VITE_RAZORPAY_KEY_ID on Netlify), open Razorpay Checkout directly.
-      if (config.razorpayEnabled) {
-        try {
-          const orderRes = await fetch('/api/razorpay/create-order', {
+      // Use server-side Orders API when both Key ID & Secret are configured on Express or Netlify Functions.
+      if (serverOrdersEnabled) {
+        const orderResult = await fetchJsonWithFallback(
+          ['/api/razorpay/create-order', '/.netlify/functions/razorpay-create-order'],
+          {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -724,25 +757,20 @@ export function DonationPage() {
               paymentMethod: `razorpay_${methodId}`,
               cause
             })
-          });
-
-          const contentType = orderRes.headers.get('content-type') || '';
-          if (contentType.includes('application/json')) {
-            const order = await orderRes.json();
-            if (orderRes.status === 503 && order?.code === 'MISSING_SECRET') {
-              // Secret not configured in server/Functions yet — proceed with direct Razorpay Checkout using public key
-              serverOrder = null;
-            } else if (!orderRes.ok || order.error) {
-              setPaymentError(order.error || 'Could not initiate payment order.');
-              setIsProcessing(false);
-              return;
-            } else if (order?.id) {
-              serverOrder = order;
-            }
           }
-        } catch {
-          // Network/function unreachable — fall back to direct Razorpay Checkout with public key
-          serverOrder = null;
+        );
+
+        if (orderResult) {
+          const { res: orderRes, data: order } = orderResult;
+          if (orderRes.status === 503 && order?.code === 'MISSING_SECRET') {
+            serverOrder = null;
+          } else if (!orderRes.ok || order.error) {
+            setPaymentError(order.error || 'Could not initiate payment order.');
+            setIsProcessing(false);
+            return;
+          } else if (order?.id) {
+            serverOrder = order;
+          }
         }
       }
 
@@ -787,35 +815,31 @@ export function DonationPage() {
           };
 
           if (serverOrder) {
-            try {
-              const verifyRes = await fetch('/api/razorpay/verify', {
+            const verifyResult = await fetchJsonWithFallback(
+              ['/api/razorpay/verify', '/.netlify/functions/razorpay-verify'],
+              {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   ...response,
                   donationDetails: donationMeta
                 })
-              });
-              const verifyContentType = verifyRes.headers.get('content-type') || '';
-              if (verifyContentType.includes('application/json')) {
-                const result = await verifyRes.json();
-                if (result.success && result.donation) {
-                  setReceiptData(result.donation);
-                  setIsProcessing(false);
-                  setShowPaymentModal(false);
-                  setStep(4);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  return;
-                } else {
-                  setPaymentError(result.message || 'Payment verification failed!');
-                  setIsProcessing(false);
-                  return;
-                }
               }
-            } catch {
-              setPaymentError('Error verifying payment. Please contact us with your payment ID.');
-              setIsProcessing(false);
-              return;
+            );
+            if (verifyResult) {
+              const { data: result } = verifyResult;
+              if (result.success && result.donation) {
+                setReceiptData(result.donation);
+                setIsProcessing(false);
+                setShowPaymentModal(false);
+                setStep(4);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+              } else {
+                setPaymentError(result.message || 'Payment verification failed!');
+                setIsProcessing(false);
+                return;
+              }
             }
           }
 
