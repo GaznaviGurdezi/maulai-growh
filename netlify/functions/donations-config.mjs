@@ -15,7 +15,7 @@ const FOUNDATION_PAYMENT_CONFIG = {
 
 export const handler = async () => {
   const keyId = (process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || "").trim();
-  const keySecret = (process.env.RAZORPAY_KEY_SECRET || "").trim();
+  const keySecret = (process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET || "").trim();
   const razorpayEnabled = Boolean(keyId && keySecret);
 
   return {

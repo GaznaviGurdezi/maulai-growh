@@ -697,48 +697,50 @@ export function DonationPage() {
       const amountInPaise = Math.round(amountToPay * 100);
       let serverOrder: { id: string; amount: number; currency: string; receiptNumber?: string } | null = null;
 
-      // Always try server-side Orders API (works on both Express server and Netlify Functions)
-      try {
-        const orderRes = await fetch('/api/razorpay/create-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: amountToPay,
-            currency: 'INR',
-            donorName: details.fullName.trim(),
-            donorEmail: details.email.trim(),
-            countryCode: details.countryCode,
-            mobile: cleanDigits,
-            donorMobile: formattedContact,
-            donorType,
-            frequency,
-            country: details.country.trim(),
-            city: details.city.trim(),
-            pan: details.pan.trim().toUpperCase(),
-            require80G: details.require80G,
-            prayerRequest: details.prayerRequest.trim(),
-            paymentMethod: `razorpay_${methodId}`,
-            cause
-          })
-        });
+      // Use server-side Orders API when both Key ID & Secret are configured on the server/Netlify Functions.
+      // If only the public Key ID is configured (e.g. VITE_RAZORPAY_KEY_ID on Netlify), open Razorpay Checkout directly.
+      if (config.razorpayEnabled) {
+        try {
+          const orderRes = await fetch('/api/razorpay/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              amount: amountToPay,
+              currency: 'INR',
+              donorName: details.fullName.trim(),
+              donorEmail: details.email.trim(),
+              countryCode: details.countryCode,
+              mobile: cleanDigits,
+              donorMobile: formattedContact,
+              donorType,
+              frequency,
+              country: details.country.trim(),
+              city: details.city.trim(),
+              pan: details.pan.trim().toUpperCase(),
+              require80G: details.require80G,
+              prayerRequest: details.prayerRequest.trim(),
+              paymentMethod: `razorpay_${methodId}`,
+              cause
+            })
+          });
 
-        const contentType = orderRes.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          const order = await orderRes.json();
-          if (!orderRes.ok || order.error) {
-            setPaymentError(order.error || 'Could not initiate payment order.');
-            setIsProcessing(false);
-            return;
+          const contentType = orderRes.headers.get('content-type') || '';
+          if (contentType.includes('application/json')) {
+            const order = await orderRes.json();
+            if (orderRes.status === 503 && order?.code === 'MISSING_SECRET') {
+              // Secret not configured in server/Functions yet — proceed with direct Razorpay Checkout using public key
+              serverOrder = null;
+            } else if (!orderRes.ok || order.error) {
+              setPaymentError(order.error || 'Could not initiate payment order.');
+              setIsProcessing(false);
+              return;
+            } else if (order?.id) {
+              serverOrder = order;
+            }
           }
-          if (order?.id) {
-            serverOrder = order;
-          }
-        }
-      } catch {
-        if (config.razorpayEnabled) {
-          setPaymentError('Unable to reach payment server. Please check your connection or use UPI QR / Bank Transfer.');
-          setIsProcessing(false);
-          return;
+        } catch {
+          // Network/function unreachable — fall back to direct Razorpay Checkout with public key
+          serverOrder = null;
         }
       }
 

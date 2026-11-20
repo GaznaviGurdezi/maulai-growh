@@ -28,7 +28,7 @@ export const handler = async (event) => {
   }
 
   try {
-    const keySecret = (process.env.RAZORPAY_KEY_SECRET || "").trim();
+    const keySecret = (process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET || "").trim();
     if (!keySecret) {
       return {
         statusCode: 500,

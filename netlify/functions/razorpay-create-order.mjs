@@ -29,13 +29,15 @@ export const handler = async (event) => {
 
   try {
     const keyId = (process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || "").trim();
-    const keySecret = (process.env.RAZORPAY_KEY_SECRET || "").trim();
+    const keySecret = (process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_SECRET || "").trim();
 
     if (!keyId || !keySecret) {
       return {
         statusCode: 503,
         headers: JSON_HEADERS,
         body: JSON.stringify({
+          code: "MISSING_SECRET",
+          keyConfigured: Boolean(keyId),
           error:
             "Online card/netbanking gateway is currently being activated. Please use UPI QR or Direct Bank Transfer.",
         }),
